@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# NOTE on credentials: these MUST match .env.test.example / .env.test
+# exactly (same POSTGRES_USER/PASSWORD/DB as the Makefile and as whatever
+# your test fixtures set at import time). A real project had this
+# workflow using postgres/postgres while the tests hard-coded a
+# different user/db, causing every test run to hang retrying the DB
+# connection - only discovered after fixing an unrelated CI bug that had
+# been silently hiding it for weeks.
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: app_test
+          POSTGRES_PASSWORD: test-password
+          POSTGRES_DB: app_testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        # NOTE the quoting: --health-cmd "pg_isready -U app_test" (double
+        # quotes, no '='). The form --health-cmd='pg_isready -U app_test'
+        # gets misparsed by the runner's Docker CLI and fails with
+        # "unknown shorthand flag: 'U' in -U" before any container even
+        # starts - this broke CI silently for weeks in a real project.
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements.txt
+          pip install -r api/requirements-dev.txt
+
+      - name: Run migrations
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: app_test
+          PGPASSWORD: test-password
+          POSTGRES_DB: app_testdb
+        run: scripts/run_migrations.sh
+
+      - name: Run tests
+        run: pytest -q

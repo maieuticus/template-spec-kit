@@ -1,0 +1,42 @@
+# Makefile targets for local/CI test database lifecycle.
+#
+# Credentials come from .env.test (copy .env.test.example -> .env.test and
+# adjust if needed). This is the ONLY place test DB credentials should be
+# defined - the CI workflow must read the same file, and test fixtures
+# must not hard-code different values. See templates/api-service/README.md
+# for the incident that motivated this.
+
+.PHONY: ci-test start-db wait-db migrate test stop-db
+
+include .env.test
+export
+
+DB_CONTAINER_NAME := app-ci-postgres
+DB_PORT := $(POSTGRES_PORT)
+
+# NOTE the flag order: --quiet MUST come before the image name, otherwise
+# Docker passes it to the postgres server entrypoint instead of to
+# `docker run`, which fails with "FATAL: --quiet requires a value".
+start-db:
+	-@docker rm -f $(DB_CONTAINER_NAME) >/dev/null 2>&1 || true
+	docker run --quiet --name $(DB_CONTAINER_NAME) \
+		-e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) \
+		-e POSTGRES_USER=$(POSTGRES_USER) \
+		-e POSTGRES_DB=$(POSTGRES_DB) \
+		-p $(DB_PORT):5432 \
+		-d postgres:16
+
+wait-db:
+	@echo "Waiting for Postgres to be ready..."
+	@attempts=0; until docker exec $(DB_CONTAINER_NAME) pg_isready -U $(POSTGRES_USER) >/dev/null 2>&1 || [ $$attempts -gt 30 ]; do sleep 1; attempts=$$((attempts+1)); done; if [ $$attempts -gt 30 ]; then echo "Postgres did not start in time"; exit 1; fi
+
+migrate:
+	POSTGRES_HOST=localhost POSTGRES_PORT=$(DB_PORT) POSTGRES_USER=$(POSTGRES_USER) PGPASSWORD=$(POSTGRES_PASSWORD) POSTGRES_DB=$(POSTGRES_DB) scripts/run_migrations.sh
+
+test:
+	pytest -q
+
+ci-test: stop-db start-db wait-db migrate test stop-db
+
+stop-db:
+	-@docker rm -f $(DB_CONTAINER_NAME) >/dev/null 2>&1 || true
