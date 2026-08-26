@@ -1,0 +1,115 @@
+"""Generic OpenAPI <-> FastAPI route parity test.
+
+Copy this file into your project's `tests/` directory (drop the
+`.template` suffix), adjust the two CONFIG constants below, and add it to
+the regular test suite. It exists because a real project (Alfred Topics
+API) shipped an OpenAPI spec whose `/daily-plans/*` paths never matched
+the actual FastAPI routes at all, and the only existing OpenAPI test just
+checked that the YAML parsed - it never checked path/operation parity.
+
+What this test catches:
+- Routes implemented in code but missing from the OpenAPI document.
+- Paths documented in OpenAPI but not implemented in code.
+- Dangling `$ref`s pointing at schemas/responses that don't exist.
+- Schemas defined in `components/schemas` but never referenced anywhere.
+"""
+
+import os
+import re
+import sys
+
+import pytest
+import yaml
+
+# --- CONFIG: adjust these two lines for your project -----------------------
+OPENAPI_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "openapi", "openapi.yaml"
+)
+APP_IMPORT = "app.main:app"  # "module.path:attribute", importable from API_DIR
+API_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "api")
+# -----------------------------------------------------------------------------
+
+sys.path.insert(0, API_DIR)
+
+
+def _load_openapi_paths():
+    with open(OPENAPI_PATH, encoding="utf-8") as f:
+        spec = yaml.safe_load(f)
+    paths = set()
+    for path, methods in spec.get("paths", {}).items():
+        for method in methods:
+            if method in ("get", "post", "put", "patch", "delete"):
+                paths.add((method.upper(), path))
+    return spec, paths
+
+
+def _load_app_routes():
+    module_path, attr = APP_IMPORT.split(":")
+    module = __import__(module_path, fromlist=[attr])
+    app = getattr(module, attr)
+    routes = set()
+    for route in app.routes:
+        methods = getattr(route, "methods", None)
+        path = getattr(route, "path", None)
+        if not methods or not path:
+            continue
+        for method in methods:
+            if method in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+                routes.add((method, path))
+    return routes
+
+
+def test_openapi_paths_match_app_routes():
+    """Every path/method in the app must be documented, and vice versa."""
+    _, openapi_paths = _load_openapi_paths()
+    app_routes = _load_app_routes()
+
+    missing_from_openapi = app_routes - openapi_paths
+    missing_from_app = openapi_paths - app_routes
+
+    assert not missing_from_openapi, (
+        "Routes implemented in code but missing from OpenAPI spec: "
+        f"{sorted(missing_from_openapi)}"
+    )
+    assert not missing_from_app, (
+        "Paths documented in OpenAPI but not implemented in code "
+        f"(or path parameter names differ): {sorted(missing_from_app)}"
+    )
+
+
+def test_no_dangling_refs():
+    """Every $ref must point at a schema/response that actually exists."""
+    spec, _ = _load_openapi_paths()
+    schemas = set(spec.get("components", {}).get("schemas", {}).keys())
+    responses = set(spec.get("components", {}).get("responses", {}).keys())
+
+    with open(OPENAPI_PATH, encoding="utf-8") as f:
+        text = f.read()
+
+    refs = re.findall(
+        r'\$ref:\s*["\']#/components/(schemas|responses)/([A-Za-z0-9_]+)["\']',
+        text,
+    )
+    missing = [
+        (kind, name)
+        for kind, name in refs
+        if name not in (schemas if kind == "schemas" else responses)
+    ]
+    assert not missing, f"Dangling $ref(s) found: {missing}"
+
+
+def test_no_unused_schemas():
+    """Every schema in components/schemas should be referenced somewhere."""
+    spec, _ = _load_openapi_paths()
+    schemas = set(spec.get("components", {}).get("schemas", {}).keys())
+
+    with open(OPENAPI_PATH, encoding="utf-8") as f:
+        text = f.read()
+
+    used = set(re.findall(r'\$ref:\s*["\']#/components/schemas/([A-Za-z0-9_]+)["\']', text))
+    unused = schemas - used
+    assert not unused, f"Unused schema(s) defined but never referenced: {sorted(unused)}"
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
