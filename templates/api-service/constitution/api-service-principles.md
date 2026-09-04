@@ -34,3 +34,17 @@ abwichen. Der einzige vorhandene Test prüfte nur, ob die YAML-Datei
 syntaktisch gültig ist — die Abweichung fiel erst bei einem manuellen Audit
 auf. Ein Test wie in `templates/api-service/tests/test_openapi_contract.py.template`
 hätte das beim ersten abweichenden Commit automatisch gemeldet.
+
+## API-Änderungen werden vor der Umsetzung vollständig geplant
+
+Jedes Feature, das API-Routen, öffentliche Schemas, Datenhaltung,
+Authentifizierung oder Infrastruktur verändert, muss vor `/tasks` einen
+konkreten Plan für Vertragskompatibilität, Datenmigration, Testfälle, Release,
+Rollback sowie externe Verbraucher enthalten. Das zugehörige
+`docs/api-feature-planning.md` dient dabei als Checkliste. `db/init.sql` darf
+nicht als Produktionsmigrationsweg geplant werden.
+
+**Begründung:** Bei API-Services reichen reine Code-Aufgaben nicht aus: Eine
+Änderung kann gleichzeitig den OpenAPI-Vertrag, gespeicherte Daten, Clients
+und den Betrieb betreffen. Ein verbindlicher Plan macht diese Abhängigkeiten
+vor der Implementierung sichtbar und hält den Feature-Schnitt überprüfbar.

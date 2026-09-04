@@ -1,0 +1,26 @@
+# Generic FastAPI production container.
+#
+# Place beside requirements.txt and the `app/` package, then adjust the
+# uvicorn module path only when the application object is elsewhere.
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# curl is useful for a Compose healthcheck such as:
+# curl -fsS http://localhost:8000/health || exit 1
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependencies first so source-only changes retain the install layer.
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -17,6 +17,9 @@ nicht wiederholen.
 | CI schlug wochenlang fehl, ohne dass es auffiel | Falsches Quoting bei `--health-cmd` im Docker-Healthcheck; ein kaputter CI-Lauf maskierte weitere Bugs | Korrektes Quoting bereits in `ci.template.yml` vorgegeben |
 | Doku-Wildwuchs: mehrere widersprüchliche Deployment-Guides, tote Links | Kein Single-Source-of-Truth-Dokument von Projektbeginn an | `docs/DV_KONZEPT.template.md` |
 | Infrastruktur-Doku widersprach dem echten Verhalten (Quick Tunnel statt Named Tunnel) | Niemand hatte die Doku gegen den echten Containerstart verifiziert | Kommentierter Cloudflared-Snippet mit Warnung, siehe unten |
+| Produktionskonfiguration war nicht klar von Testwerten getrennt | Dokumentierte Platzhalter und lokale Secret-Dateien fehlten | `.env.example` und `.gitignore.snippet` |
+| Init-Skripte konnten versehentlich im Release-Kontext laufen | Kein sicherer Standard beim Ausführen von Migrationen | `scripts/run_migrations.sh.template` und `docs/migrations.template.md` |
+| PATCH-Validierung war nur anwendungsspezifisch abgesichert | Null-, Leer- und Duplikatfälle wurden leicht übersehen | `tests/test_schema_validation.py.template` |
 | Stale Artefakte (`.pr_body.txt` u. ä.) sammelten sich an | Keine Aufräum-Routine bei PRs | `.github/PULL_REQUEST_TEMPLATE.md` mit Checkliste |
 | Kleine Syntaxfehler (z. B. Docker-Flag-Reihenfolge) blieben lange unbemerkt | `make ci-test` wurde nicht regelmäßig lokal ausgeführt | Empfehlung in diesem README + Makefile-Template mit korrekter Flag-Reihenfolge |
 
@@ -33,6 +36,24 @@ nicht wiederholen.
 - `.env.test.example` — einzige Quelle für Test-Datenbank-Zugangsdaten.
   Nach `.env.test.example` im neuen Projekt kopieren; `Makefile` und
   CI-Workflow lesen daraus (siehe Kommentare in den jeweiligen Dateien).
+- `.env.example` — Produktionskonfiguration mit sicheren Platzhaltern für
+  Datenbank, API-Key und optionalen Tunnel-Token. Nach `.env` kopieren,
+  individuelle Secrets setzen und niemals einchecken.
+- `api/Dockerfile.template` — schlanker, cachefreundlicher FastAPI-Container
+  mit unbuffered Logs und `curl` für einen Compose-Healthcheck.
+- `docs/migrations.template.md` + `scripts/run_migrations.sh.template` —
+  Regeln und Ausführungsskript für lexikalisch sortierte, idempotente
+  Migrationen. Das Init-Skript wird nur mit dem expliziten Test-Flag
+  `RUN_INIT_FOR_TESTS=1` ausgeführt.
+- `docs/api-feature-planning.template.md` — Ergänzung zum Spec-Kit-Plan:
+  Checkliste und `/plan`-Prompt für Scope, API-Vertrag, Migrationen, Tests,
+  Rollout und Rollback eines API-Features.
+- `.github/copilot-instructions.md.template` — ausfüllbares Grundgerüst für
+  Architektur, Datenbank- und API-Vertragsregeln, Testabläufe und
+  Geheimnisschutz.
+- `tests/test_schema_validation.py.template` — anpassbare Pydantic-Tests für
+  PATCH-Modelle: gezieltes Leeren nullable Felder, Pflichtfelder,
+  leere Updates und doppelte Referenzen.
 - `Makefile.template` — `start-db`/`wait-db`/`migrate`/`test`/`ci-test`
   mit korrekter Docker-Flag-Reihenfolge und Zugangsdaten aus
   `.env.test.example`.
@@ -60,7 +81,9 @@ nicht wiederholen.
 
 1. Projekt wie gewohnt mit `specify init` aufsetzen (siehe `QUICKSTART.md`).
 2. Aus diesem Ordner die passenden Dateien in die entsprechenden Zielpfade
-   kopieren (siehe Tabelle oben) und Platzhalter ausfüllen.
+   kopieren (siehe Tabelle oben) und Platzhalter ausfüllen. Für API-Features
+   `docs/api-feature-planning.template.md` nach `docs/api-feature-planning.md`
+   kopieren und beim Spec-Kit-Schritt `/plan` verwenden.
 3. `speckit.audit` in `.github/agents/` und `.github/prompts/` einhängen und
    bei jedem größeren Merge oder vor jedem Release aufrufen.
 4. Die zwei Prinzipien aus `constitution/api-service-principles.md` an die

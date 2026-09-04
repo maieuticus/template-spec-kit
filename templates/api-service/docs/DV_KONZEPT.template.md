@@ -17,6 +17,7 @@ Technische Referenzen, die bei Änderungen maßgeblich sind:
 - Laufzeitkonfiguration: `<pfad/zu/docker-compose.yml>`
 - Konfigurationsvorlage: `<pfad/zu/.env.example>`
 - Datenbankschema: `<pfad/zu/db/init.sql>` und `<pfad/zu/db/migrations/>`
+- Migrationsregeln: `<pfad/zu/docs/migrations.md>`
 
 ## 2. Systemübersicht und Verantwortlichkeiten
 
@@ -65,8 +66,11 @@ sie nie in Git eingecheckt werden dürfen.>
 2. Vor Datenbankänderungen: Backup an einem Pfad **außerhalb** des
    Git-Arbeitsverzeichnisses erstellen.
 3. Geprüften Git-Stand ausrollen.
-4. Neue Migrationen anwenden (niemals das Init-Skript erneut gegen
-   Produktionsdaten laufen lassen, falls es Tabellen droppt/neu anlegt).
+4. Neue Migrationen anwenden. Das Init-Skript darf niemals erneut gegen
+   Produktionsdaten laufen, falls es Tabellen droppt/neu anlegt. Der
+   Migrationsbefehl muss standardmäßig ausschließlich idempotente Dateien
+   unter `db/migrations/` ausführen; eine Initialisierung für Testdatenbanken
+   muss ein separates, ausdrücklich opt-in Flag erfordern.
 5. Dienste neu bauen/starten, Healthcheck und betroffene Fachfunktion
    prüfen.
 6. Bei Vertragsänderungen (API/Schema): externe Konfiguration (z. B. GPT

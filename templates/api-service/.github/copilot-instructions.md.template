@@ -1,0 +1,41 @@
+# <Projektname> Copilot Instructions
+
+## Architektur
+
+```text
+<client> -> <API contract> -> <FastAPI service> -> <PostgreSQL>
+```
+
+- `<api/app/main.py>` erstellt die Anwendung und registriert Router.
+- `<api/app/schemas.py>` enthält Request-/Response-Modelle.
+- `<api/app/database.py>` stellt Datenbankzugriffe und Transaktionsgrenzen bereit.
+- `<openapi/openapi.yaml>` ist der externe API-Vertrag. Änderungen an Routen,
+  Schemas, Authentifizierung oder Antworten aktualisieren Code, Tests und
+  Vertrag gemeinsam.
+- `<docker-compose.yml>` ist die maßgebliche Laufzeitkonfiguration;
+  `.env.example` dokumentiert alle erforderlichen Umgebungsvariablen.
+- `db/init.sql` erstellt ausschließlich frische Testdatenbanken.
+  Produktive Schemaänderungen erfolgen nur über idempotente
+  `db/migrations/*.sql`.
+
+## Arbeitsweise
+
+- Verwende parametrisierte SQL-Abfragen und halte Datenbanktransaktionen in
+  den Router-/Service-Grenzen konsistent.
+- Bewahre eine einheitliche API-Fehlerstruktur und bestehende HTTP-Semantik.
+- Ergänze Endpoint-Tests im passenden Testmodul. Bei Vertragsänderungen muss
+  auch der OpenAPI-Vertragstest erfolgreich bleiben.
+- Nutze für den vollständigen lokalen Datenbanktest `make ci-test`.
+- Führe `scripts/run_migrations.sh` in Produktionsbefehlen ohne
+  `RUN_INIT_FOR_TESTS=1` aus. Dieses Flag ist nur für wegwerfbare Tests erlaubt.
+- Keine echten `.env`-Dateien, API-Keys, Passwörter, Tokens, Backups oder
+  persistenten Daten in Git einchecken.
+
+## Vor dem Abschluss einer Änderung
+
+- Bei API-Änderungen: Implementierung, API-Vertrag und Tests gemeinsam
+  aktualisieren.
+- Bei Schemaänderungen: idempotente Migration, Tests und Release-Schritt
+  ergänzen.
+- Bei Konfigurations- oder Infrastrukturänderungen: `.env.example`,
+  Compose-Konfiguration und DV-Konzept synchron halten.
