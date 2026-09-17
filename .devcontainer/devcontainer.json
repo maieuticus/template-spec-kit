@@ -1,6 +1,13 @@
 {
   "name": "template-spec-kit",
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "dockerComposeFile": ["compose.yaml", "compose.local.yaml"],
+  "service": "dev",
+  "workspaceFolder": "/workspaces/project",
+  "remoteUser": "vscode",
+  "overrideCommand": false,
+  "shutdownAction": "stopCompose",
+  "runServices": ["dev"],
+  "initializeCommand": ["python", "scripts/container_init.py"],
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
@@ -9,15 +16,14 @@
       "repositories": {
         "maieuticus/*": {
           "permissions": {
-            "contents": "write",
-            "issues": "write",
-            "pull_requests": "write"
+            "contents": "read",
+            "issues": "write"
           }
         }
       }
     },
     "vscode": {
-      "extensions": []
+      "extensions": ["redhat.vscode-yaml", "yzhang.markdown-all-in-one"]
     }
   }
 }
