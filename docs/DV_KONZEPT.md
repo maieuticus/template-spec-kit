@@ -1,6 +1,6 @@
 # DV-Konzept: template-spec-kit
 
-**Stand:** 16.09.2026
+**Stand:** 17.09.2026
 **Status:** Projektgrundgerüst mit optionalen Technologie- und Dienstbausteinen
 
 Dieses Dokument ist die verbindliche Beschreibung von Projektziel, Architektur,
@@ -195,21 +195,120 @@ die Codespaces-Einstellungen beschränken keine weitergereichten Host-Tokens.
 
 ### Spec Kit initialisieren
 
+Die Initialisierung erfolgt im Root-Verzeichnis des erzeugten Projekts.
+Vorher dessen Abhängigkeiten installieren, die Dateien prüfen und den
+Ausgangsstand in Git sichern. Der Generator führt kein `git init` aus.
+Die vorhandene `.specify/memory/constitution.md` ist die mitgelieferte Grundlage;
+eine zweite Constitution-Vorlage wird nicht gepflegt.
+
 Im Container ist die festgelegte CLI installiert. Außerhalb kann `uvx` verwendet
 oder `python -m pip install specify-cli==1.0.7` ausgeführt werden.
 
 ```sh
-python scripts/init_speckit.py --integration copilot
+python scripts/init_speckit.py --integration codex
 ```
 
 Das Skript initialisiert die gewählte Integration, lässt die Constitution
 unverändert und verwendet die Bash-Skripte für die Arbeit im Linux-Container.
 Andere unterstützte Integrationen können über `--integration` ausgewählt werden.
 Die konkreten Agent-Dateien und Manifeste erzeugt Spec Kit.
+Für Copilot beispielsweise `--integration copilot` verwenden; ohne Angabe
+verwendet das Skript weiterhin Copilot.
 
 Die lokalen Vorlagenanpassungen bleiben unter `.specify/templates/overrides/`.
 Bei bereits initialisierten Projekten das Updateverfahren verwenden, nicht
 erneut blind initialisieren.
+
+#### Codex installieren
+
+Codex muss in derselben Umgebung verfügbar sein, in der die Integration und
+die Features ausgeführt werden. Der Devcontainer enthält Spec Kit, aber weder
+Codex noch in jedem Technologieprofil Node.js. Für eine npm-Installation
+Node.js mit npm in dieser Umgebung bereitstellen; alternativ einen zur
+Plattform passenden Installer aus der
+[offiziellen Codex-CLI-Anleitung](https://developers.openai.com/codex/cli) nutzen.
+
+Unter Windows/PowerShell:
+
+```powershell
+npm.cmd install -g @openai/codex
+codex.cmd --version
+```
+
+Unter Linux mit vorhandenem Node.js/npm entsprechend:
+
+```sh
+npm install -g @openai/codex
+codex --version
+```
+
+Im Projektverzeichnis `codex.cmd` (Windows) beziehungsweise `codex` (Linux)
+starten und beim ersten Start anmelden. Die `.cmd`-Starter funktionieren
+unter PowerShell auch dann, wenn die Ausführung der `.ps1`-Starter durch die
+Execution Policy blockiert ist.
+
+#### Codex mit Windows PowerShell initialisieren
+
+Für die Arbeit direkt unter Windows werden PowerShell-Skripte benötigt.
+`scripts/init_speckit.py` unterstützt keinen `--script`-Parameter und wählt
+immer `sh`. Für ein noch nicht initialisiertes Projekt deshalb den folgenden
+Ablauf **im Root-Verzeichnis des erzeugten Projekts** verwenden. Git, Codex,
+die Projektabhängigkeiten und `specify-cli==1.0.7` müssen installiert sein.
+
+Zuerst Arbeitsverzeichnis, Version und Ausgangsstand prüfen:
+
+```powershell
+Get-Location
+specify version
+git status
+```
+
+Die CLI-Version muss zu `speckit_version` in `config/project.yaml` passen.
+Den geprüften Ausgangsstand einschließlich Constitution vorher committen.
+Anschließend diesen Block zusammenhängend in PowerShell ausführen:
+
+```powershell
+if (Test-Path -LiteralPath .specify/integration.json) {
+    throw 'Bereits initialisiert; die Integrationsverwaltung verwenden.'
+}
+$constitutionPath = (Resolve-Path -LiteralPath .specify/memory/constitution.md).Path
+$constitutionBytes = [System.IO.File]::ReadAllBytes($constitutionPath)
+try {
+    specify init --here --force --integration codex --script ps
+    if ($LASTEXITCODE -ne 0) { throw 'Spec-Kit-Initialisierung fehlgeschlagen.' }
+}
+finally {
+    [System.IO.File]::WriteAllBytes($constitutionPath, $constitutionBytes)
+}
+```
+
+`--here` wählt das aktuelle Projekt; `--force` erlaubt das bereits gefüllte
+Verzeichnis. Der Block erhält die vorhandene Constitution auch bei einem
+Fehler. Die übrigen erzeugten Änderungen danach mit `git status`, `git diff`
+und durch Lesen neuer Dateien prüfen, insbesondere die lokalen Anpassungen
+unter `.specify/templates/overrides/`. Bei einem Fehler den Zwischenstand
+prüfen, bevor ein weiterer Initialisierungsversuch erfolgt.
+
+Mit `specify integration list` die Installation kontrollieren. Die
+[Codex-Integration von Spec Kit](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md)
+legt Skills unter `.agents/skills/speckit-*/SKILL.md` ab. Diese werden im
+Codex-Chat als `$speckit-<name>` aufgerufen. Werden sie nicht erkannt, den
+Projektordner und die installierte Integration prüfen und Codex neu starten;
+siehe [Skill-Erkennung in Codex](https://developers.openai.com/codex/skills).
+
+#### Bestehende Integrationen
+
+`specify integration list` zeigt installierte Integrationen. Fehlt Codex in
+einem bereits initialisierten Projekt, kann es mit
+`specify integration install codex --script ps` ergänzt und mit
+`specify integration use codex` als Standard gewählt werden. Im Linux-Container
+stattdessen `--script sh` verwenden. Einen Austausch der bisherigen Integration
+mit `specify integration switch codex` bewusst vornehmen.
+
+Nach einem geplanten Versionsupdate werden die verwalteten Dateien mit
+`specify integration upgrade codex` aktualisiert. Dabei den festgehaltenen
+Versionsstand und das [Updateverfahren](#weiterentwicklung-und-versionen)
+beachten. Ein erneutes `specify init --force` ist kein regulärer Updateweg.
 
 ## Entwicklung
 
@@ -222,6 +321,42 @@ erneut blind initialisieren.
 5. Implementieren und relevante Tests ausführen.
 6. Ergebnis gegen die Akzeptanzkriterien prüfen; Lücken nacharbeiten.
 7. Betroffene Abschnitte dieses Konzepts aktualisieren und den Diff prüfen.
+
+#### Manueller Ablauf mit Codex
+
+Zu Projektbeginn einmal `$speckit-constitution` im Codex-Chat aufrufen.
+Der Agent liest zuerst `AGENTS.md`, README, dieses DV-Konzept, die bestehende
+Constitution sowie Code und Tests. Projektziel und Grundsatzentscheidungen
+werden hier konkretisiert; notwendige Änderungen der Constitution werden
+begründet und versioniert. Die Constitution enthält dauerhafte Regeln,
+einzelne Feature-Anforderungen gehören in die jeweilige Spezifikation.
+
+Für jedes abgegrenzte Feature die folgenden Skills einzeln im Codex-Chat
+aufrufen und ihre Ergebnisse vor dem nächsten Schritt prüfen:
+
+| Schritt | Zweck und Ergebnis |
+| --- | --- |
+| `$speckit-specify` | Gewünschtes Verhalten, Nutzen und überprüfbare Akzeptanzkriterien in `specs/<nummer>-<name>/spec.md` festhalten; bestehenden Projektkontext berücksichtigen. |
+| `$speckit-clarify` | Offene Anforderungen, Randfälle und Widersprüche vor der Planung klären. |
+| `$speckit-plan` | Technische Umsetzung in `plan.md` beschreiben; gewähltes Profil, vorhandene Architektur, Verträge, Migrationen und relevante Tests berücksichtigen. |
+| `$speckit-checklist` | Qualität, Eindeutigkeit und Vollständigkeit der Anforderungen prüfen; ersetzt keinen Test der Implementierung. |
+| `$speckit-tasks` | Ausführbare Aufgaben in `tasks.md` aus Spezifikation und Plan ableiten. |
+| `$speckit-analyze` | Constitution, Spezifikation, Plan und Aufgaben auf Konsistenz prüfen; wesentliche Befunde vor der Implementierung beheben. |
+| `$speckit-implement` | Geplante Aufgaben einschließlich Code und relevanter Tests umsetzen. |
+| `$speckit-converge` | Umsetzung und Artefakte gegen die Anforderungen prüfen; verbleibende Lücken in Aufgaben überführen. |
+
+Clarify und Checklist werden nach Bedarf eingesetzt; vor größeren Umsetzungen
+gehört Analyze dazu. Bestehende APIs, Datenmodelle, Tests und Build-/Deployment-
+Konfigurationen beim Spezifizieren und Planen berücksichtigen. Zusätzliche
+Abhängigkeiten und Architekturänderungen begründen, Breaking Changes benennen.
+
+Zum Abschluss `python scripts/check.py` und die im Feature geplanten Prüfungen
+ausführen, die Akzeptanzkriterien abgleichen und tatsächliche Prüfergebnisse
+festhalten. Offene Aufgaben aus `converge` umsetzen, erneut testen und abgleichen.
+Vor einem Commit auch neue Dateien prüfen; `git diff` zeigt unversionierte
+Dateien nicht. Kleine Korrekturen brauchen nur einen angemessenen Prozess.
+
+#### Automatisierter Workflow
 
 Der lokale Workflow liegt unter
 `.specify/workflows/project-sdd/workflow.yml`:
