@@ -9,6 +9,10 @@ Zuletzt erledigt · Aktuell in Arbeit · Nächste Schritte · Blockaden
 Projektziel, Architektur, Entwicklung und Betrieb stehen gemeinsam im
 [DV-Konzept](docs/DV_KONZEPT.md).
 
+Beim Erzeugen dieses Projekts über GitHub **Include all branches** aktivieren,
+damit `main` und `development` aus dem Template übernommen werden. Ohne diese
+Option wird nur `main` kopiert.
+
 ## Start
 
 1. [Einrichtung](docs/DV_KONZEPT.md#einrichtung) durchführen.

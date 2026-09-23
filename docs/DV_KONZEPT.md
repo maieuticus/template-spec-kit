@@ -119,6 +119,14 @@ tests/           Tests des Template-Generators und seiner Zugriffsregeln
 | Lokale Secrets | Ignorierte `.env`, niemals Git |
 | Versions- und Profilnachweis | `config/project.yaml` |
 
+Das Template veröffentlicht `main` als stabilen Ausgangspunkt und `development`
+als gemeinsamen Entwicklungszweig. GitHub übernimmt bei „Use this template“
+standardmäßig nur den Default-Branch. In der Weboberfläche deshalb
+**Include all branches** auswählen; mit der CLI `gh repo create ... --template
+maieuticus/template-spec-kit --include-all-branches` verwenden. Erst dann
+enthält das neue Repository beide Branches. Die aus einer Vorlage erzeugten
+Branches haben unabhängige Historien und dienen als getrennte Startzweige.
+
 `config/project.yaml` und `config/repositories.yaml` sind Konventionen dieses
 Templates. Spec Kit wertet sie nicht selbst aus. Die Integrationsmetadaten
 unter `.specify/integration.json` und `.specify/integrations/` erzeugt dagegen
@@ -223,6 +231,8 @@ Template-Katalog, Generator-Tests und hiesige Rohmaterialien werden nicht
 
 Bei Verwendung von GitHubs „Use this template“ zunächst die neue Kopie als
 Generator öffnen und das ausgewählte Projekt in ein leeres Ziel ausgeben.
+**Include all branches** aktivieren, wenn `main` und `development` übernommen
+werden sollen.
 Ein Umbau eines bereits gefüllten Arbeitsverzeichnisses wird bewusst nicht
 automatisch durchgeführt.
 
@@ -663,6 +673,7 @@ Dokument bei Änderungen zusammenführen.
 | VS-Code-Aufgabe | Konfiguration und tatsächlicher Statusbefehl automatisiert geprüft; interaktiver Start beim Ordneröffnen noch nicht ausgeführt (T006) |
 | Neue Codex-Arbeitssitzung | Agentenregeln ergänzt; Anzeige in einer neu gestarteten Sitzung nicht separat geprüft |
 | GitHub Actions und Laufzeitprüfungen der Profile | In dieser Sitzung nicht ausgeführt; bisheriger Stand unten |
+| Branches des Templates | `main` und `development` auf `origin` veröffentlicht; Übernahme in neue Projekte über **Include all branches** dokumentiert |
 
 ### Bisherige Prüfung des Grundgerüsts
 

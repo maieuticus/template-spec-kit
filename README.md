@@ -52,6 +52,16 @@ und anschließend geklonte Kopie dient zunächst als Generator. Erzeuge daraus
 dein Anwendungsprojekt in einem leeren Ziel; siehe
 [Projekterzeugung](docs/DV_KONZEPT.md#neues-projekt-erzeugen).
 
+Das Template enthält die Branches `main` und `development`. Beim Erzeugen über
+die GitHub-Oberfläche **Include all branches** aktivieren, damit beide Branches
+in der neuen Repository-Kopie angelegt werden. Mit der GitHub CLI:
+
+```sh
+gh repo create mein-projekt --template maieuticus/template-spec-kit --private --include-all-branches
+```
+
+Ohne diese Option übernimmt GitHub nur den Default-Branch `main`.
+
 Wechsle anschließend in das erzeugte Projekt (beim API-Beispiel in `../meine-api`):
 
 ```sh

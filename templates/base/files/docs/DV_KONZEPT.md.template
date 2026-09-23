@@ -62,6 +62,12 @@ Features. Projektgrundlage, Werkzeugeinrichtung und Feature-Umsetzung werden
 jeweils geprüft. Die Spec-Kit-Integration ist nach der Projekterzeugung noch
 nicht initialisiert.
 
+Das Template stellt `main` als stabilen Ausgangspunkt und `development` als
+gemeinsamen Entwicklungszweig bereit. Bei der Erstellung aus einer GitHub-
+Vorlage muss **Include all branches** ausgewählt werden, damit beide Branches
+angelegt werden. Mit der CLI lautet die relevante Option
+`--include-all-branches`.
+
 ## Architektur
 
 Das Grundgerüst trennt Entwicklungsumgebung, Entwicklungsmethodik,
