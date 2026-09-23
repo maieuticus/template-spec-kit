@@ -18,6 +18,9 @@ Projektziel, Architektur, Entwicklung und Betrieb stehen gemeinsam im
 ## Orientierung
 
 - [DV-Konzept](docs/DV_KONZEPT.md)
+- [Spec Kit einrichten und Agentenaufrufe](docs/DV_KONZEPT.md#spec-kit)
+- [Befehle erklärt](docs/DV_KONZEPT.md#befehle-und-aufruforte)
+- [Feature-Ablauf](docs/DV_KONZEPT.md#feature-ablauf)
 - [Constitution](.specify/memory/constitution.md)
 - [Arbeitsregeln](AGENTS.md)
 - [Dokumentation](docs/README.md)

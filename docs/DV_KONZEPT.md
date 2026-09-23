@@ -12,33 +12,35 @@ werden nicht gepflegt.
 
 **Stand:** 2026-09-23
 
-**Aktives Feature:** [002 – Arbeitsstand beim Wiedereinstieg](../specs/002-projektstatus/spec.md)
+**Aktives Feature:** Kein neues Feature; Dokumentationspflege zu Spec Kit abgeschlossen.
 
 ### Zuletzt erledigt
 
-- Wiederverwendbares Projektgrundgerüst mit Technologieprofilen und Diensten
-  aufgebaut; [Aufgaben von Feature 001](../specs/001-template-foundation/tasks.md).
-- Einrichtung mit Spec Kit und Codex in README und DV-Konzept beschrieben.
-- Direkten README-Einstieg, Statusbefehl, VS-Code-Aufgabe und Agentenregeln
-  ergänzt; neue Projekte erhalten einen eigenen Anfangsstand.
+- Projektübersicht mit README-Einstieg, Statusbefehl und Agentenregeln umgesetzt;
+  [Aufgaben von Feature 002](../specs/002-projektstatus/tasks.md).
+- Zwei allgemeine Spec-Kit-Quickstarts und die allgemeinen Anteile des
+  historischen Boardgame-Quickstarts gesichtet; Befehle mit Spec Kit 1.0.7 abgeglichen.
+- Befehlerklärungen, Agentenaufrufe und den Umgang mit vorhandenen Unterlagen
+  in dieses Konzept und die Projektvorlagen übernommen; zwei überholte
+  Spec-Kit-Rohdateien entfernt. [Auswertung und Verbleib](raw-materials/README.md#auswertung-der-spec-kit-unterlagen-am-23092026).
 
 ### Aktuell in Arbeit
 
-- Feature 002 ist implementiert und automatisiert geprüft. Die manuelle
-  Startprüfung in VS Code steht aus;
-  [Aufgaben von Feature 002](../specs/002-projektstatus/tasks.md).
+- Keine laufende Umsetzung. Die manuelle Startprüfung aus Feature 002 bleibt offen.
 
 ### Nächste Schritte
 
 1. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
 2. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
-   manuell ausführen und das Ergebnis in Aufgabe T006 festhalten.
+   manuell ausführen und das Ergebnis in [T006](../specs/002-projektstatus/tasks.md) festhalten.
 
 ### Blockaden und Prüfstatus
 
-- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests erfolgreich.
-- `python scripts/status.py`: Statusausgabe erfolgreich geprüft.
-- Keine Implementierungsblockade; interaktive Startanzeige noch nicht geprüft.
+- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests nach
+  Übernahme der Erklärungen erfolgreich; auch erzeugte Projekte geprüft.
+- Spec-Kit-Befehle anhand der Referenz für 1.0.7 abgeglichen;
+  Initialisierung und Agenten-Chat nicht erneut ausgeführt.
+- Keine Blockade; interaktive Startanzeige aus Feature 002 weiterhin ungeprüft.
 - Frühere Ergebnisse und offene Laufzeitprüfungen stehen im [Prüfstatus](#prüfstatus).
 
 ## Inhalt
@@ -74,6 +76,19 @@ des Grundgerüsts.
 Mobile Frameworks können als weitere Profile ergänzt werden. Native
 Plattformwerkzeuge bleiben eine zusätzliche Voraussetzung; iOS benötigt
 insbesondere die Apple-Entwicklungsumgebung.
+
+### Zusammenspiel von Template, Spec Kit und Agent
+
+| Baustein | Aufgabe |
+| --- | --- |
+| Dieses Template | Erzeugt Projektstruktur, Technologieprofil, Konfiguration, DV-Konzept, Arbeitsregeln und gemeinsame Prüfungen. |
+| Spec Kit / Specify CLI | Richtet die gewählte Agent-Integration und die Werkzeuge für Spezifikation, Planung und Umsetzung ein. |
+| Coding-Agent, etwa Codex oder Copilot | Bearbeitet die Feature-Schritte im Projekt anhand der Anforderungen und Regeln. |
+| Entwickler | Klärt Ziele, prüft Ergebnisse und entscheidet über Veröffentlichung. |
+
+Ein erzeugtes Grundgerüst besitzt bereits eine Constitution, aber noch keine
+initialisierte Spec-Kit-Integration. Installation des Werkzeugs, Initialisierung
+des Projekts und Bearbeitung einzelner Features sind getrennte Schritte.
 
 ## Architektur
 
@@ -160,6 +175,36 @@ Im Template-Verzeichnis:
 python -m pip install -r scripts/requirements.txt
 python scripts/create_project.py --help
 ```
+
+### Befehle und Aufruforte
+
+Terminalbefehle im Root des jeweiligen Projekts ausführen. Unter PowerShell
+zeigt `Get-Location` den Ordner, unter Bash `pwd`. `python --version` muss
+mindestens Python 3.11 anzeigen; falls die Umgebung nur `python3` bereitstellt,
+diesen Interpreter entsprechend verwenden. Werkzeuge und Abhängigkeiten
+müssen in der tatsächlich verwendeten Umgebung installiert sein.
+
+| Terminalbefehl | Aussage und Zweck |
+| --- | --- |
+| `git status` | Branch sowie vorgemerkte, nicht vorgemerkte und unversionierte Änderungen ansehen. |
+| `specify version` | Installierte CLI-Version und Laufzeitumgebung anzeigen; mit `speckit_version` in `config/project.yaml` vergleichen. |
+| `specify check` | Verfügbarkeit unterstützter Agent-CLI-Werkzeuge prüfen; IDE-Integrationen werden übersprungen. |
+| `specify integration list` | Verfügbare und installierte Integrationen sowie die Standardintegration ansehen. |
+| `specify integration status` | Im initialisierten Projekt verwaltete Integrationsdateien und gemeinsame Spec-Kit-Struktur diagnostizieren. |
+| `python scripts/status.py` | Den dokumentierten Arbeitsstand anzeigen. |
+| `python scripts/check.py` | Dokumentlinks, Syntax und konfigurierte Projektprüfungen ausführen. |
+| `git diff` / `git diff --cached` | Noch nicht vorgemerkte / bereits vorgemerkte Änderungen prüfen; neue unversionierte Dateien zusätzlich lesen. |
+
+`specify check` ist ein Werkzeugcheck; die Projektprüfungen laufen über
+`scripts/check.py` und die zusätzlichen Feature-Tests. Eine erfolgreiche
+Versionsausgabe bestätigt noch keine eingerichtete Integration.
+Die Unterscheidung folgt der [CLI-Referenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/core.md)
+und der [Integrationsreferenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md).
+
+`uv` ist optional. Auch bei Installation über `uv tool install` die festgelegte
+Version wählen, etwa `uv tool install specify-cli==1.0.7`. Die Profilanleitung
+bestimmt Installation und Tests der Anwendung. `uv sync` und `uv run pytest`
+sind hier keine profilübergreifenden Standardbefehle.
 
 ### Neues Projekt erzeugen
 
@@ -253,6 +298,25 @@ verwendet das Skript weiterhin Copilot.
 Die lokalen Vorlagenanpassungen bleiben unter `.specify/templates/overrides/`.
 Bei bereits initialisierten Projekten das Updateverfahren verwenden, nicht
 erneut blind initialisieren.
+
+#### Agent-Integration und Chat-Aufrufe
+
+Mit `--integration` genau die gewünschte Integration wählen: `codex`,
+`copilot` oder beispielsweise `cursor-agent`. Im Container nutzt das Init-Skript
+Bash; für native PowerShell den unten beschriebenen Ablauf mit `--script ps`
+verwenden. Der Agent muss in dieser Umgebung nutzbar sein.
+
+Die folgenden Beispiele gehören in den **Agenten-Chat**, nicht ins Terminal:
+
+| Integration in Spec Kit 1.0.7 | Beispiel | Installierte Dateien |
+| --- | --- | --- |
+| Codex | `$speckit-specify` | `.agents/skills/speckit-*/SKILL.md` |
+| GitHub Copilot im Standardmodus | `/speckit-specify` | `.github/skills/speckit-*/SKILL.md` |
+
+Bei anderen Agenten oder abweichenden Installationsmodi die tatsächlich
+angebotenen Aufrufe verwenden. Die punktierte Schreibweise `/speckit.specify`
+aus älteren Anleitungen und Referenztexten gilt nicht pauschal für jede
+Integration. Die Schritte des [Feature-Ablaufs](#ablauf-je-feature) bleiben gleich.
 
 #### Codex installieren
 
@@ -389,6 +453,29 @@ dem [Updateverfahren](#weiterentwicklung-und-versionen).
 5. Implementieren und relevante Tests ausführen.
 6. Ergebnis gegen die Akzeptanzkriterien prüfen; Lücken nacharbeiten.
 7. Betroffene Abschnitte dieses Konzepts aktualisieren und den Diff prüfen.
+
+#### Vorhandene Unterlagen in kleine Features überführen
+
+Rohmaterialien zuerst auf Quelle, Stand, Widersprüche und konkreten Nutzen
+prüfen. Abgestimmte Projektziele und Grundsatzentscheidungen hierher übernehmen;
+einzelne Anforderungen in `specs/<nummer>-<name>/spec.md` überführen.
+Beispiele aus fremden Projekten legen weder Technologie noch Ordnerstruktur
+des neuen Projekts fest.
+
+Die erste Spezifikation beschreibt Nutzerziel, beobachtbares Verhalten,
+Akzeptanzkriterien und ausdrücklich ausgeschlossenen Umfang. Bestehende
+technische Randbedingungen berücksichtigen; neue Implementierungsentscheidungen
+im anschließenden `plan.md` begründen. Aus einem großen Konzept zunächst einen
+kleinen, unabhängig prüfbaren Funktionsumfang auswählen. Zusätzliche Dienste,
+Verzeichnisse und spätere Ausbaustufen erst bei einem konkreten Bedarf ergänzen.
+
+Vor der Spec-Kit-Initialisierung den geprüften Ausgangsstand lokal sichern;
+die anschließend erzeugten Integrationsdateien separat prüfen und committen.
+So bleiben Projektgrundlage und Werkzeugeinrichtung in Git nachvollziehbar.
+Zum Abschluss eines Features die vorgesehenen Dateien gezielt mit
+`git add -- <geprüfte-dateien>` vormerken (Platzhalter ersetzen), mit
+`git diff --cached` prüfen und lokal committen. Ein Push ist ein eigener
+Veröffentlichungsschritt im beauftragten Umfang.
 
 #### Manueller Ablauf mit Codex
 
@@ -556,6 +643,15 @@ Dokument bei Änderungen zusammenführen.
 
 ## Prüfstatus
 
+### Konsolidierung der Spec-Kit-Unterlagen – 23.09.2026
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| `python scripts/check.py` | Dokumentlinks, Anker, Dateisyntax und alle 14 Tests erfolgreich; erzeugte Projekte eingeschlossen |
+| Befehlsbedeutung und Aufrufsyntax | Mit den CLI- und Integrationsreferenzen für Spec Kit 1.0.7 abgeglichen |
+| Umfang der Bereinigung | Zwei allgemeine Spec-Kit-Rohdateien entfernt; Boardgame- und Sport-App-Unterlagen unverändert erhalten |
+| Spec-Kit-Initialisierung, Agenten-Chat, interaktiver VS-Code-Start und CI | In dieser Sitzung nicht ausgeführt |
+
 ### Arbeitsstand beim Wiedereinstieg – 23.09.2026
 
 | Prüfung | Ergebnis |
@@ -595,6 +691,8 @@ und Konfigurationstests ersetzen keinen erfolgreichen Containerstart.
 - [Spec-Kit-Anpassungen](https://github.github.io/spec-kit/guides/customization.html)
 - [Spec-Kit-Workflows](https://github.github.io/spec-kit/reference/workflows.html)
 - [Spec-Kit-Integrationen](https://github.github.io/spec-kit/reference/integrations.html)
+- [Spec-Kit-CLI-Befehle, Stand 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/core.md)
+- [Spec-Kit-Agent-Aufrufe und Integrationsdiagnose, Stand 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md)
 - [Spec Kit 1.0.7](https://github.com/github/spec-kit/releases/tag/v1.0.7)
 - [Docker-Bind-Mounts](https://docs.docker.com/engine/storage/bind-mounts/)
 - [Devcontainer-Mounts und Codespaces](https://code.visualstudio.com/remote/advancedcontainers/add-local-file-mount)

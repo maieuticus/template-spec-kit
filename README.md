@@ -211,6 +211,9 @@ die du bei jedem Feature wiederholst. Wenn Skills fehlen, prüfe
 | Thema | Einstieg |
 | --- | --- |
 | Einrichtung und täglicher Start | [Quickstart](QUICKSTART.md) |
+| Template, Spec Kit und Agent erklärt | [Zusammenspiel](docs/DV_KONZEPT.md#zusammenspiel-von-template-spec-kit-und-agent) |
+| Befehle verstehen und Probleme eingrenzen | [Befehle und Aufruforte](docs/DV_KONZEPT.md#befehle-und-aufruforte) |
+| Copilot und andere Agenten | [Integrationen und Chat-Aufrufe](docs/DV_KONZEPT.md#agent-integration-und-chat-aufrufe) |
 | Verbindliche Projektbeschreibung | [DV-Konzept](docs/DV_KONZEPT.md) |
 | Entwicklungsmethodik | [Constitution](.specify/memory/constitution.md) |
 | Feature-Spezifikationen | [Feature-Übersicht](specs/README.md) |

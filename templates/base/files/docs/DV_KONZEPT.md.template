@@ -56,6 +56,12 @@ des Umfangs? Fachliche Kriterien noch vor der Implementierung abstimmen.
 Ursprüngliche Konzepte liegen unter `docs/raw-materials/`. Konkrete Anforderungen
 und Akzeptanzkriterien werden je Feature unter `specs/` gepflegt.
 
+Das Template liefert das Grundgerüst samt Profil und Prüfungen. Spec Kit richtet
+die gewählte Agent-Integration ein; der Coding-Agent bearbeitet damit einzelne
+Features. Projektgrundlage, Werkzeugeinrichtung und Feature-Umsetzung werden
+jeweils geprüft. Die Spec-Kit-Integration ist nach der Projekterzeugung noch
+nicht initialisiert.
+
 ## Architektur
 
 Das Grundgerüst trennt Entwicklungsumgebung, Entwicklungsmethodik,
@@ -130,17 +136,101 @@ Lock-/Constraint-Stand ergänzen. Die Toolversionen des Grundgerüsts stehen in
 
 ### Spec Kit
 
-Im Container ist die festgelegte Version installiert. Außerhalb die Version
-aus `config/project.yaml` installieren oder `uvx` bereitstellen.
+Im Projekt-Root arbeiten und zuerst die [Abhängigkeiten](#abhängigkeiten)
+installieren. Der Generator initialisiert kein Git-Repository: bei Bedarf
+`git init` ausführen, Dateien prüfen und den Ausgangsstand lokal committen.
+Die vorhandene Constitution ist die Grundlage; keine zweite Vorlage anlegen.
+
+Die CLI-Version steht als `speckit_version` in `config/project.yaml`.
+Im Container ist sie bereits installiert. Außerhalb dieselbe Version
+bereitstellen; für den mitgelieferten Stand lautet die Installation:
 
 ```sh
-python scripts/init_speckit.py --integration copilot
+python -m pip install specify-cli==1.0.7
+specify version
 ```
 
-Andere unterstützte Integrationen über `--integration` wählen. Die CLI erzeugt
-ihre Agent-Dateien und Manifeste. Das Skript erhält die Constitution und
-verwendet Bash-Skripte für die Arbeit im Linux-Container.
-Bei bestehender Integration den manifestgestützten Upgrade-Weg benutzen.
+Mit vorhandenem `uv` ist `uv tool install specify-cli==1.0.7` eine Alternative.
+Auch den gewählten Coding-Agenten in der verwendeten Umgebung bereitstellen;
+der Devcontainer installiert ihn nicht automatisch.
+
+**Linux-Container / Bash:** Einmalig die gewünschte Integration initialisieren,
+zum Beispiel Codex:
+
+```sh
+python scripts/init_speckit.py --integration codex
+```
+
+Alternativ `--integration copilot` oder `--integration cursor-agent` wählen.
+Das Skript prüft die festgelegte Version, erhält die Constitution und verwendet
+Bash-Skripte (`--script sh`). Es besitzt keinen eigenen `--script`-Parameter.
+
+**Native Windows PowerShell:** Nach Versionsprüfung und gesichertem
+Ausgangsstand stattdessen diesen zusammenhängenden Block für ein noch nicht
+initialisiertes Projekt verwenden; er erhält die vorhandene Constitution:
+
+```powershell
+if (Test-Path -LiteralPath .specify/integration.json) {
+    throw 'Bereits initialisiert; die Integrationsverwaltung verwenden.'
+}
+$constitutionPath = (Resolve-Path -LiteralPath .specify/memory/constitution.md).Path
+$constitutionBytes = [System.IO.File]::ReadAllBytes($constitutionPath)
+try {
+    specify init --here --force --integration codex --script ps
+    if ($LASTEXITCODE -ne 0) { throw 'Spec-Kit-Initialisierung fehlgeschlagen.' }
+}
+finally {
+    [System.IO.File]::WriteAllBytes($constitutionPath, $constitutionBytes)
+}
+```
+
+Auch hier bei Bedarf `codex` durch die gewünschte Integration ersetzen.
+`--here` wählt den aktuellen Ordner, `--force` erlaubt die Initialisierung im
+gefüllten Projekt und `--script ps` wählt PowerShell. Bei einem Fehler den
+Zwischenstand prüfen, bevor ein weiterer Versuch erfolgt.
+
+Anschließend `specify integration list` und `specify integration status`
+ausführen, mit `git status` und `git diff` die Änderungen prüfen und neue
+Dateien zusätzlich lesen. Die geprüften Integrationsdateien in einem eigenen
+lokalen Commit sichern. Bei einem späteren Wiedereinstieg keine erneute
+Initialisierung durchführen. Für geplante Versionswechsel den manifestgestützten
+Weg `specify integration upgrade <integration>` verwenden und Änderungen prüfen.
+
+Die Feature-Schritte gehören in den **Agenten-Chat**. Spec Kit 1.0.7 installiert
+Codex-Skills unter `.agents/skills/`, Copilot-Skills standardmäßig unter
+`.github/skills/`:
+
+| Agent | Beispiel im Chat |
+| --- | --- |
+| Codex | `$speckit-specify` |
+| GitHub Copilot, Standardmodus | `/speckit-specify` |
+
+Bei anderen Agenten oder Installationsmodi die dort angebotene Schreibweise
+verwenden; `/speckit.specify` aus Referenztexten gilt nicht für jede Integration.
+Siehe [Integrationsreferenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md).
+
+### Befehle und Aufruforte
+
+Im Terminal zeigt `Get-Location` unter PowerShell beziehungsweise `pwd` unter
+Bash das aktuelle Verzeichnis. Mit `python --version` den Interpreter prüfen;
+falls die Umgebung nur `python3` bereitstellt, diesen entsprechend verwenden.
+
+| Terminalbefehl | Zweck |
+| --- | --- |
+| `git status` | Branch und vorgemerkte, nicht vorgemerkte sowie unversionierte Änderungen ansehen. |
+| `specify version` | CLI-Version mit `config/project.yaml` vergleichen. |
+| `specify check` | Verfügbare Agent-CLI-Werkzeuge prüfen; IDE-Integrationen werden übersprungen. |
+| `specify integration list` | Installierte Integrationen und Standardintegration ansehen. |
+| `specify integration status` | Verwaltete Integrationsdateien und gemeinsame Spec-Kit-Struktur diagnostizieren. |
+| `python scripts/status.py` | Dokumentierten Arbeitsstand lesen. |
+| `python scripts/check.py` | Dokumentlinks, Syntax und konfigurierte Projektprüfungen ausführen. |
+| `git diff` / `git diff --cached` | Nicht vorgemerkte / vorgemerkte Änderungen prüfen; unversionierte Dateien zusätzlich lesen. |
+
+Die [CLI-Referenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/core.md)
+beschreibt `specify check` als Werkzeugcheck. Für die Anwendung gelten die
+[Projektprüfungen](#prüfungen). Abhängigkeiten gemäß dem gewählten Profil
+installieren; `uv sync` und `uv run pytest` sind keine allgemeinen Schritte
+dieses Templates.
 
 ## Entwicklung
 
@@ -178,6 +268,34 @@ Details bleiben in den verlinkten Feature-Aufgaben und Prüfergebnissen.
 Rohmaterialien und Wissen sichten, Feature spezifizieren, Unklarheiten klären,
 technischen Plan erstellen, Aufgaben ableiten, Konsistenz prüfen, implementieren,
 testen und Ergebnis gegen die Akzeptanzkriterien prüfen.
+
+Die vorhandene Constitution einmal auf das Projekt konkretisieren. Danach
+für jeden kleinen, unabhängig prüfbaren Funktionsumfang die passenden
+Spec-Kit-Schritte im Agenten-Chat aufrufen:
+
+| Schritt | Ergebnis |
+| --- | --- |
+| `specify` | Nutzerziel, Verhalten, Akzeptanzkriterien und ausgeschlossener Umfang in `spec.md`. |
+| `clarify` | Offene fachliche Fragen vor der technischen Planung klären. |
+| `plan` | Technische Umsetzung und Prüfungen in `plan.md` begründen. |
+| `checklist` | Nach Bedarf Klarheit und Vollständigkeit der Anforderungen prüfen. |
+| `tasks` | Ausführbare Aufgaben aus Spec und Plan in `tasks.md` ableiten. |
+| `analyze` | Vor größeren Umsetzungen Konsistenz und wesentliche Lücken prüfen. |
+| `implement` | Aufgaben einschließlich relevanter Tests umsetzen. |
+| `converge` | Umsetzung mit Anforderungen abgleichen; offene Lücken nacharbeiten. |
+
+Die Namen mit der unter [Spec Kit](#spec-kit) beschriebenen Aufrufsyntax
+verwenden, etwa `$speckit-plan` in Codex. Rohmaterialien auf Quelle, Stand und
+Widersprüche prüfen. Abgestimmte Grundsatzentscheidungen hier pflegen;
+Feature-Artefakte gehören gemeinsam nach `specs/<nummer>-<name>/`.
+Vorhandene technische Randbedingungen beachten und zusätzliche Technologien
+erst im Plan begründen. Umfangreiche Vorlagen oder Beispielprojekte bedeuten
+keinen Auftrag, alle Funktionen oder Verzeichnisse sofort umzusetzen.
+
+Vor dem Abschluss Akzeptanzkriterien, tatsächliche Tests und Git-Diff prüfen,
+auch neue Dateien lesen und den [Arbeitsstand](#aktueller-arbeitsstand) pflegen.
+Dateien für einen lokalen Commit gezielt vormerken und mit `git diff --cached`
+prüfen. Ein Push bleibt ein eigener Veröffentlichungsschritt im beauftragten Umfang.
 
 Der vorbereitete Workflow kann nach Klärung der Anforderungen ausgeführt werden:
 
