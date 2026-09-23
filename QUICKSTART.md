@@ -1,5 +1,9 @@
 # Quickstart
 
+Schon eingerichtet? Direkt zum
+[aktuellen Arbeitsstand](docs/DV_KONZEPT.md#aktueller-arbeitsstand).
+Im Terminal zeigt `python scripts/status.py` denselben Stand an.
+
 Die verbindlichen Schritte und Voraussetzungen stehen im
 [DV-Konzept – Einrichtung](docs/DV_KONZEPT.md#einrichtung).
 

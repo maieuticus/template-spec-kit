@@ -28,7 +28,7 @@
 ## Phase 4: Prüfung und Abschluss
 
 - [ ] T005 `python scripts/check.py` und zusätzliche Prüfungen aus plan.md ausführen.
-- [ ] T006 Betroffene Abschnitte in `docs/DV_KONZEPT.md` aktualisieren.
+- [ ] T006 Betroffene Abschnitte in `docs/DV_KONZEPT.md` einschließlich „Aktueller Arbeitsstand“ aktualisieren: Datum, Feature, Erledigtes, laufende Arbeit, nächste Schritte, Blockaden und tatsächliche Prüfungen.
 - [ ] T007 Akzeptanzkriterien gegen Ergebnisse abgleichen und offene Lücken erfassen.
 
 ## Dependencies & Execution Order

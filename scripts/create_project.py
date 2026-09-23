@@ -2,6 +2,7 @@
 
 import argparse
 from copy import deepcopy
+from datetime import date
 import json
 from pathlib import Path
 import re
@@ -16,7 +17,7 @@ SERVICES = ("postgres", "keycloak", "observability")
 CORE_FILES = (
     "AGENTS.md", ".gitignore", ".gitattributes", ".editorconfig", ".dockerignore", ".env.example",
     ".devcontainer/Dockerfile", "config/repositories.yaml",
-    "scripts/check.py", "scripts/container_init.py", "scripts/init_speckit.py",
+    "scripts/check.py", "scripts/status.py", "scripts/container_init.py", "scripts/init_speckit.py",
     "scripts/prepare_contribution.py", "scripts/requirements.txt",
     "docs/decisions/README.md",
 )
@@ -128,6 +129,7 @@ def render_files(name: str, stack: str, services: list[str], recipe: str | None 
     ).encode()
     substitutions = {
         "{{PROJECT_NAME}}": name, "{{STACK}}": stack,
+        "{{CREATED_DATE}}": date.today().isoformat(),
         "{{SERVICES}}": ", ".join(services) or "keine",
         "{{RECIPE}}": recipe or "keines", "{{SETUP_COMMANDS}}": "\n".join(setup),
         "{{CHECK_COMMANDS}}": "\n".join(" ".join(c) for c in config["checks"]) or

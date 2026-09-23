@@ -2,6 +2,14 @@
 
 - Lies zuerst `README.md`, `docs/DV_KONZEPT.md` und
   `.specify/memory/constitution.md`. Prüfe vor Änderungen `git status`.
+- Gleiche zu Beginn einer neuen Arbeitssitzung den Abschnitt „Aktueller
+  Arbeitsstand“ im DV-Konzept mit Git und den relevanten Feature-Aufgaben ab.
+  Zeige in der ersten inhaltlichen Antwort kurz zuletzt Erledigtes, laufende
+  Arbeit, nächste Schritte und Blockaden; benenne veraltete oder unklare Angaben.
+- Pflege bei beauftragten Änderungen den Arbeitsstand nach wesentlichen
+  Schritten und vor einer Übergabe: Standdatum, aktives Feature, Erledigtes,
+  laufende Arbeit, priorisierte nächste Schritte und tatsächliche Prüfungen.
+  Verlinke die maßgeblichen Feature-Aufgaben, statt sie vollständig zu kopieren.
 - Projektziel, Architektur, Entwicklung und Betrieb werden ausschließlich im
   DV-Konzept gepflegt. Keine parallelen `vision.md`, `architecture.md`,
   `development.md` oder `operations.md` anlegen.

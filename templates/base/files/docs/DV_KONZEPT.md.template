@@ -9,8 +9,36 @@ Dieses Dokument enthält die verbindliche Projektbeschreibung einschließlich
 Projektziel, Architektur, Entwicklung und Betrieb. README und Quickstart
 verlinken hierher. Keine parallelen Konzeptdokumente anlegen.
 
+## Aktueller Arbeitsstand
+
+**Stand:** {{CREATED_DATE}} (Projekterzeugung)
+
+**Aktives Feature:** Noch keines; Einrichtung und Projektklärung.
+
+### Zuletzt erledigt
+
+- Grundgerüst mit Profil `{{STACK}}`, Diensten `{{SERVICES}}` und
+  Rezept `{{RECIPE}}` erzeugt.
+
+### Aktuell in Arbeit
+
+- Einrichtung und fachliche Klärung stehen noch aus.
+
+### Nächste Schritte
+
+1. [Einrichtung](#einrichtung) durchführen, Dateien prüfen und den Ausgangsstand in Git sichern.
+2. [Projektziel](#projektziel) und [offene Entscheidungen](#offene-entscheidungen) konkretisieren.
+3. Spec Kit initialisieren und das erste Feature unter [specs/](../specs/README.md) spezifizieren.
+
+### Blockaden und Prüfstatus
+
+- Noch keine Projektprüfungen ausgeführt; nach der Einrichtung
+  `python scripts/check.py` ausführen und Ergebnisse hier festhalten.
+- Fachlicher Umfang und Grundsatzentscheidungen sind noch offen.
+
 ## Inhalt
 
+- [Aktueller Arbeitsstand](#aktueller-arbeitsstand)
 - [Projektziel](#projektziel)
 - [Architektur](#architektur)
 - [Einrichtung](#einrichtung)
@@ -40,6 +68,7 @@ Konfiguration, Dokumentation und Anwendungscode:
 | Constitution, Vorlagen und Workflow | `.specify/` |
 | Projektmetadaten und Referenz-Repositories | `config/` |
 | Projektbeschreibung | Dieses DV-Konzept |
+| Arbeitsstand und nächste Schritte | [Aktueller Arbeitsstand](#aktueller-arbeitsstand) in diesem Dokument |
 | Feature-Spezifikation, Plan und Aufgaben | `specs/<nummer>-<name>/` |
 | Anwendungscode und Tests | Ökosystemstruktur des gewählten Profils |
 | Produktionsartefakte | Bei Bedarf `deploy/` |
@@ -114,6 +143,35 @@ verwendet Bash-Skripte für die Arbeit im Linux-Container.
 Bei bestehender Integration den manifestgestützten Upgrade-Weg benutzen.
 
 ## Entwicklung
+
+### Wiedereinstieg und Pflege des Arbeitsstands
+
+Der Link direkt unter dem README-Titel führt zum [aktuellen Arbeitsstand](#aktueller-arbeitsstand).
+Im Projekt-Terminal zeigt derselbe Einstieg den gespeicherten Abschnitt an:
+
+```sh
+python scripts/status.py
+```
+
+Der Befehl liest ausschließlich das DV-Konzept und benötigt nur Python ab 3.11.
+Er funktioniert auch vor der Git-Initialisierung und ohne Profilabhängigkeiten.
+Der angegebene Stand ist eine gepflegte Zusammenfassung; die Anzeige führt
+keinen Git-Abgleich und keine Tests aus. Fehlende oder leere Abschnitte werden
+mit einer Fehlermeldung gemeldet.
+
+In VS Code zeigt die Aufgabe „Projektstatus anzeigen“ den Abschnitt beim
+Ordneröffnen im Terminal. Dafür dem Workspace vertrauen und in der
+Befehlspalette über „Tasks: Manage Automatic Tasks“ automatische Aufgaben für
+diesen Workspace erlauben. Über „Tasks: Run Task“ ist sie auch manuell
+ausführbar. Python muss in der geöffneten Umgebung verfügbar sein.
+
+Agenten gleichen den Arbeitsstand zu Beginn einer neuen Arbeitssitzung mit
+Git und den relevanten Feature-Aufgaben ab und zeigen den Überblick in ihrer
+ersten inhaltlichen Antwort. Das bloße Öffnen eines Ordners startet keinen
+Codex-Chat. Nach wesentlichen beauftragten Änderungen und vor einer Übergabe
+werden Datum, aktives Feature, Erledigtes, laufende Arbeit, priorisierte nächste
+Schritte, Blockaden und tatsächlich ausgeführte Prüfungen hier aktualisiert.
+Details bleiben in den verlinkten Feature-Aufgaben und Prüfergebnissen.
 
 ### Feature-Ablauf
 

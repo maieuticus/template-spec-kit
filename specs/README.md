@@ -9,3 +9,4 @@ Projektbeschreibung bleibt das [DV-Konzept](../docs/DV_KONZEPT.md).
 | Feature | Status |
 | --- | --- |
 | [001 – Wiederverwendbares Projektgrundgerüst](001-template-foundation/spec.md) | Umsetzung und Validierung |
+| [002 – Arbeitsstand beim Wiedereinstieg](002-projektstatus/spec.md) | Implementiert; manueller VS-Code-Starttest offen |

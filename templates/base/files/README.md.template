@@ -1,5 +1,9 @@
 # {{PROJECT_NAME}}
 
+**[Aktueller Arbeitsstand →](docs/DV_KONZEPT.md#aktueller-arbeitsstand)**
+
+Zuletzt erledigt · Aktuell in Arbeit · Nächste Schritte · Blockaden
+
 **Profil:** {{STACK}} | **Dienste:** {{SERVICES}} | **Rezept:** {{RECIPE}}
 
 Projektziel, Architektur, Entwicklung und Betrieb stehen gemeinsam im

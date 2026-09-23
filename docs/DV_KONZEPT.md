@@ -1,6 +1,6 @@
 # DV-Konzept: template-spec-kit
 
-**Stand:** 17.09.2026
+**Stand:** 23.09.2026
 **Status:** Projektgrundgerüst mit optionalen Technologie- und Dienstbausteinen
 
 Dieses Dokument ist die verbindliche Beschreibung von Projektziel, Architektur,
@@ -8,8 +8,42 @@ Entwicklung und Betrieb. README, Quickstart und Verzeichnisübersichten verlinke
 hierher. Getrennte Dateien für Vision, Architektur, Entwicklung oder Betrieb
 werden nicht gepflegt.
 
+## Aktueller Arbeitsstand
+
+**Stand:** 2026-09-23
+
+**Aktives Feature:** [002 – Arbeitsstand beim Wiedereinstieg](../specs/002-projektstatus/spec.md)
+
+### Zuletzt erledigt
+
+- Wiederverwendbares Projektgrundgerüst mit Technologieprofilen und Diensten
+  aufgebaut; [Aufgaben von Feature 001](../specs/001-template-foundation/tasks.md).
+- Einrichtung mit Spec Kit und Codex in README und DV-Konzept beschrieben.
+- Direkten README-Einstieg, Statusbefehl, VS-Code-Aufgabe und Agentenregeln
+  ergänzt; neue Projekte erhalten einen eigenen Anfangsstand.
+
+### Aktuell in Arbeit
+
+- Feature 002 ist implementiert und automatisiert geprüft. Die manuelle
+  Startprüfung in VS Code steht aus;
+  [Aufgaben von Feature 002](../specs/002-projektstatus/tasks.md).
+
+### Nächste Schritte
+
+1. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
+2. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
+   manuell ausführen und das Ergebnis in Aufgabe T006 festhalten.
+
+### Blockaden und Prüfstatus
+
+- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests erfolgreich.
+- `python scripts/status.py`: Statusausgabe erfolgreich geprüft.
+- Keine Implementierungsblockade; interaktive Startanzeige noch nicht geprüft.
+- Frühere Ergebnisse und offene Laufzeitprüfungen stehen im [Prüfstatus](#prüfstatus).
+
 ## Inhalt
 
+- [Aktueller Arbeitsstand](#aktueller-arbeitsstand)
 - [Projektziel](#projektziel)
 - [Architektur](#architektur)
 - [Einrichtung](#einrichtung)
@@ -62,6 +96,7 @@ tests/           Tests des Template-Generators und seiner Zugriffsregeln
 | --- | --- |
 | Gemeinsame Prinzipien | `.specify/memory/constitution.md` |
 | Projektbeschreibung | Dieses Dokument |
+| Arbeitsstand und nächste Schritte | [Aktueller Arbeitsstand](#aktueller-arbeitsstand) in diesem Dokument |
 | Konkrete Feature-Anforderung | `specs/<nummer>-<name>/spec.md` |
 | Technischer Feature-Plan und Aufgaben | `plan.md` und `tasks.md` im Feature |
 | Rohmaterialien | `docs/raw-materials/` |
@@ -312,6 +347,39 @@ beachten. Ein erneutes `specify init --force` ist kein regulärer Updateweg.
 
 ## Entwicklung
 
+### Wiedereinstieg und Pflege des Arbeitsstands
+
+Der Link direkt unter dem README-Titel führt zum [aktuellen Arbeitsstand](#aktueller-arbeitsstand).
+Im Projekt-Terminal zeigt derselbe Einstieg den gespeicherten Abschnitt an:
+
+```sh
+python scripts/status.py
+```
+
+Der Befehl liest ausschließlich das DV-Konzept und benötigt nur Python ab 3.11.
+Er funktioniert auch vor der Git-Initialisierung und ohne Profilabhängigkeiten.
+Der angegebene Stand ist eine gepflegte Zusammenfassung; die Anzeige führt
+keinen Git-Abgleich und keine Tests aus. Fehlende oder leere Abschnitte werden
+mit einer Fehlermeldung gemeldet.
+
+In VS Code zeigt die Aufgabe „Projektstatus anzeigen“ den Abschnitt beim
+Ordneröffnen im Terminal. Dafür dem Workspace vertrauen und in der
+Befehlspalette über „Tasks: Manage Automatic Tasks“ automatische Aufgaben für
+diesen Workspace erlauben. Über „Tasks: Run Task“ ist sie auch manuell
+ausführbar. Python muss in der geöffneten Umgebung verfügbar sein.
+
+Agenten gleichen den Arbeitsstand zu Beginn einer neuen Arbeitssitzung mit
+Git und den relevanten Feature-Aufgaben ab und zeigen den Überblick in ihrer
+ersten inhaltlichen Antwort. Das bloße Öffnen eines Ordners startet keinen
+Codex-Chat. Nach wesentlichen beauftragten Änderungen und vor einer Übergabe
+werden Datum, aktives Feature, Erledigtes, laufende Arbeit, priorisierte nächste
+Schritte, Blockaden und tatsächlich ausgeführte Prüfungen hier aktualisiert.
+Details bleiben in den verlinkten Feature-Aufgaben und Prüfergebnissen.
+
+Neue Projekte erhalten diese Einstiege und einen eigenen Anfangsstand mit
+Erzeugungsdatum. Bestehende Projekte übernehmen die Änderungen gezielt nach
+dem [Updateverfahren](#weiterentwicklung-und-versionen).
+
 ### Ablauf je Feature
 
 1. Rohmaterial und relevantes Wissen lesen; Projektziel im DV-Konzept klären.
@@ -488,6 +556,20 @@ Dokument bei Änderungen zusammenführen.
 
 ## Prüfstatus
 
+### Arbeitsstand beim Wiedereinstieg – 23.09.2026
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| `python scripts/check.py` | Dokumentlinks, Anker, Dateisyntax und alle 14 Tests erfolgreich |
+| Status in erzeugten Projekten | Alle vier Profile und API-Rezept erfolgreich; Aufruf aus fremdem Arbeitsverzeichnis ohne Git oder Zusatzpakete, keine Dateiveränderungen |
+| Fehlerfälle und Abschnittsgrenzen | Fehlende, leere und unlesbare Dokumente/Abschnitte sowie Überschriften in Codeblöcken geprüft |
+| `python scripts/status.py` | Übersicht des Templates erfolgreich ausgegeben |
+| VS-Code-Aufgabe | Konfiguration und tatsächlicher Statusbefehl automatisiert geprüft; interaktiver Start beim Ordneröffnen noch nicht ausgeführt (T006) |
+| Neue Codex-Arbeitssitzung | Agentenregeln ergänzt; Anzeige in einer neu gestarteten Sitzung nicht separat geprüft |
+| GitHub Actions und Laufzeitprüfungen der Profile | In dieser Sitzung nicht ausgeführt; bisheriger Stand unten |
+
+### Bisherige Prüfung des Grundgerüsts
+
 Stand der lokalen Überprüfung am 16.09.2026:
 
 | Prüfung | Ergebnis |
@@ -508,6 +590,8 @@ und Konfigurationstests ersetzen keinen erfolgreichen Containerstart.
 
 ## Quellen
 
+- [VS-Code-Aufgaben beim Ordneröffnen](https://code.visualstudio.com/docs/debugtest/tasks#_run-behavior)
+- [Projektanweisungen für Codex](https://learn.chatgpt.com/docs/agent-configuration/agents-md)
 - [Spec-Kit-Anpassungen](https://github.github.io/spec-kit/guides/customization.html)
 - [Spec-Kit-Workflows](https://github.github.io/spec-kit/reference/workflows.html)
 - [Spec-Kit-Integrationen](https://github.github.io/spec-kit/reference/integrations.html)

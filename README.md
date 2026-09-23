@@ -1,5 +1,9 @@
 # template-spec-kit
 
+**[Aktueller Arbeitsstand →](docs/DV_KONZEPT.md#aktueller-arbeitsstand)**
+
+Zuletzt erledigt · Aktuell in Arbeit · Nächste Schritte · Blockaden
+
 Technologieoffenes Projektgrundgerüst für Spec-Driven Development. Ein gemeinsamer
 Kern wird mit einem Technologieprofil und den benötigten Diensten kombiniert.
 
