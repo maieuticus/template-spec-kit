@@ -10,6 +10,28 @@ Kern wird mit einem Technologieprofil und den benötigten Diensten kombiniert.
 **Projektziel, Architektur, Entwicklung und Betrieb stehen zusammen im
 [DV-Konzept](docs/DV_KONZEPT.md).**
 
+## Neuer Codespace: Copilot oder Codex starten
+
+Dieser Einstieg gilt für neue und bestehende Projekte sowie für jeden neu
+angelegten Codespace. **Diesen Abschnitt beim Ausfüllen der Projekt-README
+beibehalten.** Installierte Werkzeuge und Anmeldungen gehören zur jeweiligen
+Entwicklungsumgebung.
+
+1. Auf GitHub das Repository und den gewünschten Branch öffnen, dann
+   **Code → Codespaces → Create codespace** wählen und den Containeraufbau abwarten.
+2. Ein Bash-Terminal im Projektverzeichnis öffnen.
+3. Den gewünschten Agenten einrichten:
+   - **Copilot CLI im Terminal:** [Node.js/nvm, Installation, Anmeldung und Start](docs/DV_KONZEPT.md#copilot-cli-im-codespace).
+   - **Codex in VS Code:** [Codespace in VS Code öffnen und Codex einrichten](docs/DV_KONZEPT.md#codex-in-vs-code).
+4. Bei einem bestehenden Projekt am
+   [aktuellen Arbeitsstand](docs/DV_KONZEPT.md#aktueller-arbeitsstand) weiterarbeiten.
+   Spec Kit wegen eines neuen Codespaces nicht erneut initialisieren.
+
+Nach Stoppen und Wiederöffnen desselben Codespaces genügt normalerweise der
+Agentenstart. Nach einem neuen Codespace oder Container-Neubau die Installation
+und Anmeldung prüfen; fehlende Werkzeuge nach der
+[Codespace-Anleitung](docs/DV_KONZEPT.md#neuer-codespace-und-wiedereinstieg) wiederherstellen.
+
 ## Einstieg mit Spec Kit und Codex
 
 Der Start erfolgt in dieser Reihenfolge: **Projekt erzeugen → Spec Kit für

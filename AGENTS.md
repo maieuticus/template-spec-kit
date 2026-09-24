@@ -13,6 +13,9 @@
 - Projektziel, Architektur, Entwicklung und Betrieb werden ausschließlich im
   DV-Konzept gepflegt. Keine parallelen `vision.md`, `architecture.md`,
   `development.md` oder `operations.md` anlegen.
+- Den README-Einstieg für neue Codespaces und die zugehörige Agent-Einrichtung
+  im DV-Konzept auch beim Ausbau zum Anwendungsprojekt erhalten und bei
+  Änderungen der Entwicklungsumgebung aktualisieren.
 - Features werden unter `specs/<nummer>-<name>/` spezifiziert und geplant.
   Akzeptanzkriterien, Aufgaben, Code und relevante Tests müssen zusammenpassen.
   Kleine Korrekturen brauchen nur den ihrem Umfang angemessenen Prozess.

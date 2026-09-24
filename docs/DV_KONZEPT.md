@@ -1,6 +1,6 @@
 # DV-Konzept: template-spec-kit
 
-**Stand:** 23.09.2026
+**Stand:** 24.09.2026
 **Status:** Projektgrundgerüst mit optionalen Technologie- und Dienstbausteinen
 
 Dieses Dokument ist die verbindliche Beschreibung von Projektziel, Architektur,
@@ -10,12 +10,17 @@ werden nicht gepflegt.
 
 ## Aktueller Arbeitsstand
 
-**Stand:** 2026-09-23
+**Stand:** 2026-09-24
 
-**Aktives Feature:** Kein neues Feature; Dokumentationspflege zu Spec Kit abgeschlossen.
+**Aktives Feature:** Kein neues Feature; Dokumentationspflege für Codespaces und Agent-Einrichtung abgeschlossen.
 
 ### Zuletzt erledigt
 
+- README-Einstieg und ausführliche Einrichtung für neue Codespaces mit Copilot CLI
+  oder Codex in VS Code ergänzt; in die Projektvorlagen übernommen und den Erhalt
+  beim Ausbau zum Anwendungsprojekt in den Agentenregeln festgehalten.
+- Übernahme von `main` und `development` beim Erzeugen über GitHub dokumentiert
+  (Git-Stand `46d52c6`).
 - Projektübersicht mit README-Einstieg, Statusbefehl und Agentenregeln umgesetzt;
   [Aufgaben von Feature 002](../specs/002-projektstatus/tasks.md).
 - Zwei allgemeine Spec-Kit-Quickstarts und die allgemeinen Anteile des
@@ -26,20 +31,23 @@ werden nicht gepflegt.
 
 ### Aktuell in Arbeit
 
-- Keine laufende Umsetzung. Die manuelle Startprüfung aus Feature 002 bleibt offen.
+- Keine laufende Umsetzung. Die interaktive Codespace-Prüfung und die manuelle
+  Startprüfung aus Feature 002 bleiben offen.
 
 ### Nächste Schritte
 
-1. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
-2. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
+1. Die neue Anleitung in einem frischen Codespace einschließlich Agent-Anmeldung
+   interaktiv prüfen; nach Container-Neubau den Wiedereinstieg prüfen.
+2. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
+3. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
    manuell ausführen und das Ergebnis in [T006](../specs/002-projektstatus/tasks.md) festhalten.
 
 ### Blockaden und Prüfstatus
 
-- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests nach
-  Übernahme der Erklärungen erfolgreich; auch erzeugte Projekte geprüft.
-- Spec-Kit-Befehle anhand der Referenz für 1.0.7 abgeglichen;
-  Initialisierung und Agenten-Chat nicht erneut ausgeführt.
+- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests
+  erfolgreich; erzeugte Projekte eingeschlossen. `git diff --check` erfolgreich.
+- Installationsschritte mit offiziellen GitHub-, nvm- und OpenAI-Anleitungen
+  abgeglichen; Codespace-Aufbau, Installation und Anmeldung nicht ausgeführt.
 - Keine Blockade; interaktive Startanzeige aus Feature 002 weiterhin ungeprüft.
 - Frühere Ergebnisse und offene Laufzeitprüfungen stehen im [Prüfstatus](#prüfstatus).
 
@@ -282,6 +290,147 @@ Schreibzugriffe auf die Remotes; solche lokalen Klone sind dadurch noch kein
 schreibgeschützter Dateisystem-Mount. Für lokale Devcontainer müssen GitHub-
 Zugangsdaten separat mit entsprechend begrenztem Umfang eingerichtet werden;
 die Codespaces-Einstellungen beschränken keine weitergereichten Host-Tokens.
+
+### Neuer Codespace und Wiedereinstieg
+
+Diese Anleitung bleibt Bestandteil des Projekts, auch nachdem das Grundgerüst
+mit Anwendungscode gefüllt wurde. Den Einstieg in der README beim Überarbeiten
+erhalten. Neu erzeugte Projekte erhalten die Anleitung aus der Basisvorlage;
+bereits bestehende Repositories übernehmen spätere Änderungen gezielt.
+
+Auf GitHub das Repository und den gewünschten Branch wählen, dann unter
+**Code → Codespaces** einen neuen Codespace erstellen. Den Containeraufbau
+abwarten und ein Bash-Terminal im geöffneten Projektordner starten. Dort
+`pwd` und `git status` prüfen. Bei einem neuen Repository aus dem Template zuerst
+den Projekterzeugungsablauf der README abschließen; bei einem bestehenden
+Projekt direkt hier fortfahren.
+
+| Situation | Vorgehen |
+| --- | --- |
+| Neuer Codespace, neues oder bestehendes Repository | Gewählten Agenten installieren, Version und Anmeldung prüfen. |
+| Denselben Codespace stoppen und wieder öffnen | Agent starten; nur bei fehlendem Befehl oder abgelaufener Anmeldung nacharbeiten. |
+| Container neu bauen | Manuelle Installationen außerhalb von `/workspaces` können fehlen; Werkzeug- und Anmeldeprüfung wiederholen. |
+| Neues Terminal oder andere Node-Version | nvm laden und gewünschte Node-Version aktivieren; globale npm-Pakete sind versionsabhängig. |
+
+Der Devcontainer installiert Spec Kit, aber weder Copilot CLI noch Codex.
+Node.js wird bisher nur vom TypeScript-Profil ergänzt. Windows-Installationen
+auf dem eigenen Rechner stehen im Codespace nicht automatisch bereit.
+
+#### Copilot CLI im Codespace
+
+Voraussetzung ist ein GitHub-Konto mit Copilot-Zugang; bei einem
+Organisationskonto muss Copilot CLI freigegeben sein. Für die npm-Installation
+ist Node.js ab Version 22 erforderlich. Zuerst im **Bash-Terminal des Codespaces**
+prüfen:
+
+```bash
+node --version
+npm --version
+copilot --version
+```
+
+Fehlt nur Copilot, genügt der npm-Installationsblock unten. Fehlt Node.js/npm
+oder ist Node älter als 22, zunächst nvm prüfen:
+
+```bash
+source ~/.bashrc
+command -v nvm
+```
+
+Nur wenn nvm noch fehlt, den festgelegten Installer ausführen und in der
+aktuellen Shell laden:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+```
+
+Falls nvm danach noch nicht gefunden wird, ein neues Bash-Terminal öffnen oder
+die vom Installer ausgegebene Ladeanweisung ausführen. Anschließend Node 22
+bereitstellen:
+
+```bash
+nvm install 22
+nvm alias default 22
+nvm use 22
+
+node --version
+npm --version
+```
+
+Bei einem Projekt mit festgelegter, kompatibler Node-Version diese beibehalten;
+der Block setzt andernfalls Node 22 als Standard für neue Terminals.
+Globale npm-Pakete müssen beim Wechsel der nvm-Node-Version gegebenenfalls
+für die gewählte Version erneut installiert werden.
+
+Copilot installieren, wenn es in der aktiven Umgebung fehlt:
+
+```bash
+npm install -g @github/copilot
+copilot --version
+copilot
+```
+
+Im Copilot-Dialog bei Bedarf `/login` eingeben und die Browseranmeldung
+abschließen. Die Codespaces-/GitHub-Anmeldung allein ist kein Nachweis einer
+funktionierenden Copilot-Anmeldung. Als Funktionstest um eine Erklärung der
+README bitten. Eine Versionsausgabe allein prüft den Kontozugang noch nicht.
+Copilot CLI und der Copilot-Chat im Editor sind getrennte Oberflächen.
+
+Die npm-Installation verwendet die zum Installationszeitpunkt veröffentlichte
+Version. `copilot --version` beim Einrichten festhalten; für einen im Projekt
+festgelegten Stand gezielt `npm install -g @github/copilot@VERSION` verwenden.
+
+#### Codex in VS Code
+
+Für diesen Weg den Codespace in **VS Code Desktop** öffnen: lokal die
+GitHub-Codespaces-Erweiterung installieren, mit GitHub anmelden und über die
+Befehlspalette **Codespaces: Connect to Codespace** den Codespace auswählen.
+Prüfen, dass das VS-Code-Fenster mit diesem Codespace verbunden ist.
+
+Im verbundenen Fenster die Erweiterung **Codex von OpenAI**
+(`openai.chatgpt`) installieren bzw. für den Codespace aktivieren.
+Die Codex-Seitenleiste öffnen und dem Anmeldedialog folgen; ein Codex-Zugang
+ist erforderlich. Im Chat die README erklären lassen und prüfen, dass der
+richtige Projektordner verwendet wird. Für diesen Erweiterungsweg ist keine
+zusätzliche globale npm-Installation der Codex CLI nötig.
+
+Wer im Browser-Terminal arbeiten möchte, kann alternativ nach Bereitstellung
+von Node.js/npm die Codex CLI installieren:
+
+```bash
+npm install -g @openai/codex
+codex --version
+codex
+```
+
+Dem Anmeldedialog folgen. Für lokale Projekte in VS Code gilt dieselbe
+Erweiterungseinrichtung im lokal geöffneten Projektfenster.
+
+#### Projektintegration und Fehlerbehebung
+
+Spec Kit nur einmal je Projekt und gewünschter Integration einrichten.
+Bei einem neuen Codespace die vorhandenen Integrationsdateien aus Git verwenden
+und mit `specify integration list` prüfen. Fehlt eine gewünschte Integration,
+dem bestehenden Spec-Kit-Abschnitt folgen; vorhandene Integrationen nicht mit
+`specify init --force` überschreiben.
+
+| Symptom | Nächster Schritt |
+| --- | --- |
+| `nvm: command not found` | Bash verwenden, `source ~/.bashrc` oder neues Terminal; bei Bedarf Ladeanweisung des Installers ausführen. |
+| `node`, `npm` oder `copilot` fehlt nach Neubau/Versionswechsel | Node-Version aktivieren und fehlendes Werkzeug in dieser Umgebung erneut installieren. |
+| Copilot startet, Anmeldung/Zugriff scheitert | `/login`, verwendetes Konto und Copilot-Freigabe der Organisation prüfen. |
+| Codex-Seitenleiste fehlt | Erweiterung im verbundenen VS-Code-Fenster prüfen und Fenster neu laden. |
+| Agent läuft, Spec-Kit-Aufrufe fehlen | Installierte Projektintegration prüfen und Agent neu starten. |
+
+Offizielle Anleitungen (abgeglichen am 24.09.2026):
+[Codespace erstellen](https://docs.github.com/en/codespaces/developing-in-a-codespace/creating-a-codespace-for-a-repository),
+[Container neu bauen](https://docs.github.com/en/codespaces/developing-in-a-codespace/rebuilding-the-container-in-a-codespace),
+[nvm 0.40.3](https://github.com/nvm-sh/nvm/tree/v0.40.3),
+[Copilot CLI](https://docs.github.com/en/copilot/get-started/cli-quickstart),
+[Codespaces in VS Code](https://docs.github.com/en/codespaces/developing-in-a-codespace/using-github-codespaces-in-visual-studio-code),
+[Codex-Erweiterung](https://developers.openai.com/codex/ide) und
+[Codex CLI](https://developers.openai.com/codex/cli).
 
 ### Spec Kit initialisieren
 
@@ -652,6 +801,16 @@ Katalog aufnehmen. Projektanforderungen, aktive Konfiguration und dieses
 Dokument bei Änderungen zusammenführen.
 
 ## Prüfstatus
+
+### Codespace-Einstieg und Agent-Einrichtung – 24.09.2026
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| `python scripts/check.py` | Dokumentlinks, Anker, Dateisyntax und alle 14 Tests erfolgreich; erzeugte Projekte eingeschlossen |
+| `git diff --check` | Erfolgreich |
+| Installation und Wiedereinstieg | Mit offiziellen GitHub-, nvm- und OpenAI-Anleitungen abgeglichen; README-Einstieg, Projektvorlagen und Agentenregeln gemeinsam aktualisiert |
+| Neuer Codespace, Container-Neubau, npm-Installation, Copilot-/Codex-Anmeldung und VS-Code-Erweiterung | Hier nicht interaktiv ausgeführt |
+| Spec-Kit-Initialisierung, VS-Code-Startanzeige aus T006 und GitHub Actions | In dieser Sitzung nicht ausgeführt |
 
 ### Konsolidierung der Spec-Kit-Unterlagen – 23.09.2026
 
