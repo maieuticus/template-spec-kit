@@ -148,7 +148,9 @@ Projekt direkt hier fortfahren.
 | Container neu bauen | Manuelle Installationen außerhalb von `/workspaces` können fehlen; Werkzeug- und Anmeldeprüfung wiederholen. |
 | Neues Terminal oder andere Node-Version | nvm laden und gewünschte Node-Version aktivieren; globale npm-Pakete sind versionsabhängig. |
 
-Der Devcontainer installiert Spec Kit, aber weder Copilot CLI noch Codex.
+Der Devcontainer installiert Spec Kit und beim Post-Create-Lauf die Copilot CLI.
+Codex wird bei Bedarf separat eingerichtet. Fehlende Werkzeuge nach den
+folgenden Schritten prüfen und ergänzen.
 Node.js wird bisher nur vom TypeScript-Profil ergänzt. Windows-Installationen
 auf dem eigenen Rechner stehen im Codespace nicht automatisch bereit.
 
@@ -351,7 +353,10 @@ Codex-Skills unter `.agents/skills/`, Copilot-Skills standardmäßig unter
 | --- | --- |
 | Codex | `$speckit-specify` |
 | GitHub Copilot, Standardmodus | `/speckit-specify` |
+| GitHub Copilot mit Template-Agentenprofil | `/agent speckit-specify` |
 
+Für die Modellwahl im Chat `/model <modellname>` nutzen; falls die Umgebung
+Profilvorgaben für Unteragenten verwendet, diese über `/subagents` setzen.
 Bei anderen Agenten oder Installationsmodi die dort angebotene Schreibweise
 verwenden; `/speckit.specify` aus Referenztexten gilt nicht für jede Integration.
 Siehe [Integrationsreferenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md).
@@ -410,6 +415,37 @@ werden Datum, aktives Feature, Erledigtes, laufende Arbeit, priorisierte nächst
 Schritte, Blockaden und tatsächlich ausgeführte Prüfungen hier aktualisiert.
 Details bleiben in den verlinkten Feature-Aufgaben und Prüfergebnissen.
 
+### Schrittführung, Modellempfehlung und Template-Verbesserungen
+
+Jede inhaltliche Agentenantwort und jeder Spec-Kit-Schritt nennt genau einen
+nächsten konkreten Schritt als statusmarkierte Karte: `▶ Nächste Aktion`,
+`⏸ Entscheidung benötigt` oder `⛔ Blockiert`. Die Karte enthält je nach Status
+die festgelegten Pflichtfelder und bei Ausführung immer den konkreten Agenten,
+den exakten Modellnamen und die Reasoning-Stufe in einer Zeile.
+
+Sofern auswählbar gelten diese Modell-/Reasoning-Empfehlungen:
+`clarify` und `checklist` mit `claude-haiku-5.5` (niedrig),
+`specify`, `tasks` und `implement` mit `gpt-5.3-codex` (mittel),
+`plan`, `analyze` und `converge` mit `gpt-6-luna` (hoch). Für Architektur-,
+Sicherheits- oder Migrationsänderungen bei `implement` `gpt-6-luna` (hoch)
+verwenden. Ist ein Modell nicht verfügbar, den exakten Namen des verfügbaren
+Standardmodells nennen.
+
+Fachliche Ziele, Prioritäten, Domänenbegriffe und Produktentscheidungen bleiben
+in diesem Projekt, seinem DV-Konzept und seinen Feature-Artefakten. Nur
+wiederverwendbare Prozess-, Tooling- oder Template-Erkenntnisse werden als
+Verbesserungskandidaten behandelt. Dafür formuliert der Agent einen
+Issue-Vorschlag mit Titel, Nutzen und überprüfbaren Akzeptanzkriterien. Das
+kanonische Template-Repository ist
+https://github.com/maieuticus/template-spec-kit; Template-Verbesserungen werden
+dort als Issues angelegt, nicht im Produktprojekt. Ein Issue wird nur auf
+ausdrücklichen Auftrag erstellt.
+
+Beispiel: „Die gemeinsame Prüfung sollte fehlende Projektdateien klar
+benennen“ wird zum Vorschlag „Prüfung: Fehlende Projektdateien eindeutig
+melden“ mit dem Nutzen „schnellere Fehlerdiagnose“ und Kriterien für fehlende,
+vorhandene und unlesbare Dateien.
+
 ### Feature-Ablauf
 
 Rohmaterialien und Wissen sichten, Feature spezifizieren, Unklarheiten klären,
@@ -427,7 +463,7 @@ Spec-Kit-Schritte im Agenten-Chat aufrufen:
 | `plan` | Technische Umsetzung und Prüfungen in `plan.md` begründen. |
 | `checklist` | Nach Bedarf Klarheit und Vollständigkeit der Anforderungen prüfen. |
 | `tasks` | Ausführbare Aufgaben aus Spec und Plan in `tasks.md` ableiten. |
-| `analyze` | Vor größeren Umsetzungen Konsistenz und wesentliche Lücken prüfen. |
+| `analyze` | Vor größeren Umsetzungen Konsistenz und wesentliche Lücken prüfen; den validierbaren Bericht in `analyze.md` mit Status, Begründung und geändertem Artefakt bei `geklärt` festhalten. |
 | `implement` | Aufgaben einschließlich relevanter Tests umsetzen. |
 | `converge` | Umsetzung mit Anforderungen abgleichen; offene Lücken nacharbeiten. |
 
@@ -449,6 +485,28 @@ Der vorbereitete Workflow kann nach Klärung der Anforderungen ausgeführt werde
 ```sh
 specify workflow run .specify/workflows/project-sdd/workflow.yml -i spec="Ein kleines Feature"
 ```
+
+Nach `analyze` prüft `scripts/check_analyze_gate.py` den aktiven
+Featurepfad aus `.specify/feature.json` und dessen `analyze.md`. Fehlender
+Kontext, fehlender/unlesbarer Bericht, unbekannte oder fehlende Statusangaben
+und offene wesentliche Befunde stoppen den Workflow vor dem Gate und vor
+`implement`. Es gibt keinen stillen Fallback auf einen anderen Featurepfad.
+
+Der Bericht enthält `## Wesentliche Befunde`. Jeder Befund erhält den Status
+`offen`, `geklärt` oder `akzeptiert` und eine Begründung; bei `geklärt` ist
+`Geändertes Artefakt` erforderlich. Wenn keine wesentlichen Befunde vorliegen,
+steht exakt `Keine wesentlichen Befunde.` im Abschnitt. Als wesentlich gelten
+Auswirkungen auf Akzeptanzkriterien, Schnittstellen, Daten, Sicherheit oder
+Betrieb. Nur ein erfolgreich validierter Bericht wird am anschließenden Gate
+angezeigt. Dort ist weiterhin eine ausdrückliche Freigabe erforderlich;
+`approve` kann keine offenen Befunde übersteuern.
+
+Im Befundabschnitt steht vor der ersten Befundüberschrift nur Leerraum.
+Befunde beginnen ohne Einrückung mit `### A001 — P1: ...`; falsch eingerückte
+oder tiefere Überschriften werden zurückgewiesen. Pflichtfeldwerte beginnen
+auf derselben Zeile wie das Feld; die folgende Feldzeile ersetzt keinen leeren
+Wert. Das Post-Create-Skript wird über Bash gestartet und benötigt deshalb
+kein Ausführungsbit.
 
 Der abschließende Review prüft offene Aufgaben aus `converge` und das
 DV-Konzept. Bei Lücken nacharbeiten und erneut prüfen. Kleine Korrekturen

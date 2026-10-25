@@ -1,6 +1,6 @@
 # DV-Konzept: template-spec-kit
 
-**Stand:** 24.09.2026
+**Stand:** 25.10.2026
 **Status:** Projektgrundgerüst mit optionalen Technologie- und Dienstbausteinen
 
 Dieses Dokument ist die verbindliche Beschreibung von Projektziel, Architektur,
@@ -10,9 +10,44 @@ werden nicht gepflegt.
 
 ## Aktueller Arbeitsstand
 
-**Stand:** 2026-09-24
+### Sitzung: Spec-Kit-Aktivierung – 25.10.2026
 
-**Aktives Feature:** Kein neues Feature; Dokumentationspflege für Codespaces und Agent-Einrichtung abgeschlossen.
+- **Stand:** 2026-10-25. **Aktive Arbeit:** Codex-Einrichtung und sichtbarer
+  Aktivierungshinweis für Desktop-VS-Code und Copilot in GitHub Codespaces.
+- **Erledigt:** Spec Kit 1.0.7 mit `integration install codex --script ps`
+  eingerichtet; bestehende Projektdateien erhalten. `integration status`
+  meldet OK, Codex als Standard sowie keine fehlenden oder veränderten
+  verwalteten Dateien. README und generierte README verlinken die vorhandenen
+  Einrichtungsanleitungen direkt und nennen die Chat-Aufrufe.
+- **Erledigt:** Das Copilot-Post-Create-Skript wird nun auch in erzeugte
+  Projekte übernommen; dessen Vorhandensein und die Aktivierungshinweise
+  sind für alle vier Technologieprofile regressionsgeprüft. Eine bestehende
+  Windows-Kodierungsabhängigkeit im Generatortest wurde durch explizites
+  UTF-8 behoben.
+- **Erledigt:** `speckit-implement` wurde in dieser Sitzung geladen. Die
+  PowerShell-Vorprüfung funktioniert mit `-ExecutionPolicy RemoteSigned`
+  für den einzelnen Prozess; der explizite Feature-Kontext für Feature 002
+  wurde gesetzt. Der Dokumentkonflikt wurde inhaltlich zusammengeführt.
+- **Erledigt:** Drei Review-Korrekturen: Post-Create-Aufruf über Bash,
+  zeilengebundene Pflichtfelder und vollständige Befundstrukturprüfung;
+  [Aufgaben T013/T014](../specs/004-analyze-gate/tasks.md).
+- **Laufend:** Keine weitere Implementierung. Die gemeinsamen Prüfungen
+  bestehen mit 19 erfolgreichen Tests und einem unter Windows übersprungenen
+  POSIX-Test; der tatsächliche Containerstart bleibt ungeprüft. Das lesende
+  Nachreview der drei Korrekturen ergab keine neuen Befunde. Commit und Push
+  nach `origin/main` wurden vom Nutzer beauftragt.
+- **Priorisierter nächster Schritt:** Die POSIX-Regression unter Linux im
+  Codespace mit dem veröffentlichten Änderungsstand ausführen.
+- **Blockaden:** Neue Sandbox-Prozesse scheitern weiterhin mit
+  `setup refresh had errors`; die Integrationsprüfung lief mit freigegebenem
+  Zugriff außerhalb der Sandbox. Die interaktive Startprüfung
+  [T006](../specs/002-projektstatus/tasks.md) bleibt offen.
+
+**Stand:** 2026-10-25
+
+**Aktives Feature:** Review-Nacharbeit für [004 – Analyze-Gate](../specs/004-analyze-gate/spec.md)
+sowie Korrektur des Codespaces-Post-Create-Aufrufs;
+[Aufgaben](../specs/004-analyze-gate/tasks.md).
 
 ### Zuletzt erledigt
 
@@ -28,27 +63,101 @@ werden nicht gepflegt.
 - Befehlerklärungen, Agentenaufrufe und den Umgang mit vorhandenen Unterlagen
   in dieses Konzept und die Projektvorlagen übernommen; zwei überholte
   Spec-Kit-Rohdateien entfernt. [Auswertung und Verbleib](raw-materials/README.md#auswertung-der-spec-kit-unterlagen-am-23092026).
+- GitHub Copilot CLI als idempotentes Devcontainer-Post-Create-Skript
+  eingerichtet, in GitHub Codespaces eingebunden und die VS-Code-Erweiterung
+  ergänzt; [Devcontainer-Konfiguration](../.devcontainer/devcontainer.json).
+- Allgemeine Agenten- und Copilot-Anweisungen mit Schrittführung,
+  Modell-/Reasoning-Empfehlungen und Template-Issue-Routing ergänzt; die
+  Anweisung wird auch in Standard- und API-Projekte übernommen.
+  [Aufgaben von Feature 003](../specs/003-sdd-issue-routing/tasks.md).
+- Konkrete Modellnamen samt Stufen für Empfehlungen in den allgemeinen und
+  generierten Copilot-Anweisungen festgelegt; zugehörigen Generatortest ergänzt.
+- Nächste-Schritt-Empfehlung als Karte mit Schritt, Ziel, Agent, Modell,
+  Reasoning und prüfbarem Ergebnis festgelegt; nun als statusmarkierte
+  Aktions-, Entscheidungs- oder Blockadekarte mit konkreten Feldern umgesetzt
+  und durch Generatortests abgesichert.
+- Sieben fachneutrale Agentenprofile unter `.github/agents/` ergänzt und in die
+  Projekterzeugung übernommen.
+- Das fehlende `speckit-converge`-Profil ergänzt, im README auffindbar gemacht
+  und in Generator-Regressionen für alle Projektprofile abgesichert;
+  [Aufgaben von Feature 003](../specs/003-sdd-issue-routing/tasks.md).
+- Feature 004 spezifiziert und den technischen Plan für das Gate zwischen
+  Analyze und Implementierung erstellt; [Plan](../specs/004-analyze-gate/plan.md).
+- Aufgaben für Feature 004 aus Spezifikation und Plan abgeleitet;
+  [Aufgaben](../specs/004-analyze-gate/tasks.md).
+- Feature 004 fail-closed umgesetzt: Analysebericht, Feature-Kontext und
+  Befundstatus werden vor dem manuellen Gate validiert; A001–A003 sind gemäß
+  [Analyse](../specs/004-analyze-gate/analyze.md) geklärt.
+- Agentenprofil, DV-Konzept, Basistemplate, Generator und Regressionstests
+  verwenden denselben Berichtvertrag.
+- Spec-Kit-CLI-Smokes für offenen und fehlenden Bericht, `reject` und
+  `approve` dokumentiert; Workflow mit Spec Kit 1.0.7 erkannt.
+- `python scripts/check.py`: Dokumentlinks und Dateisyntax erfolgreich,
+  17 Tests bestanden; `--static-only` und `git diff --check` ebenfalls
+  erfolgreich.
+- Converge-Nachprüfung für Feature 004: `python -m unittest discover -s tests
+  -v` bestand ebenfalls mit 17 Tests. Spec-Kit CLI `1.0.7` erkannte den
+  Workflow mit zehn Schritten; `python scripts/check.py` und
+  `python scripts/check.py --static-only` waren erfolgreich.
+- Temporäre CLI-Smokes (Validator → Gate → Sentinel) mit expliziter
+  Testauswahl: Run `d4df1f0b` blockierte einen offenen Befund vor dem Gate,
+  Run `2fcb7501` einen fehlenden Bericht; beide ohne Sentinel. Run `998fc537`
+  endete bei `reject` abgebrochen ohne Sentinel. Run `6475c839` lief nach
+  `approve` eines geklärten Befunds bis zum Sentinel durch; Run `04fa9eca`
+  bestätigte denselben Pfad für den ausdrücklich markierten Leerbefund.
+  `verdict_input` diente nur zur nichtinteraktiven Auswahl im temporären
+  Smoke-Workflow.
+- T011/T012 aus dem Converge-Abgleich umgesetzt: Workflow- und Analyze-Profil
+  enthalten nun dieselben Wesentlichkeitskriterien (Akzeptanzkriterien,
+  Schnittstellen, Daten, Sicherheit, Betrieb; redaktionelle Befunde
+  blockieren nicht), und der fehlende Befundstatus ist als fail-closed-
+  Regressionstest abgedeckt.
 
 ### Aktuell in Arbeit
 
-- Keine laufende Umsetzung. Die interaktive Codespace-Prüfung und die manuelle
-  Startprüfung aus Feature 002 bleiben offen.
+- Feature 004 ist implementiert und vollständig regressionsgesichert.
+- Die Review-Nacharbeit zu T013/T014 ist abgeschlossen; die neuen Regressionen
+  wiesen vor der Korrektur elf fehlgeschlagene Unterfälle nach und bestehen
+  jetzt. Der zusätzliche POSIX-Laufzeittest wird unter Windows übersprungen.
+- Die interaktive VS-Code-Startanzeige aus Feature 002 und der tatsächliche
+  Codespaces-Post-Create-Lauf bleiben ungeprüft; siehe
+  [Aufgaben von Feature 002](../specs/002-projektstatus/tasks.md).
 
 ### Nächste Schritte
 
-1. Die neue Anleitung in einem frischen Codespace einschließlich Agent-Anmeldung
-   interaktiv prüfen; nach Container-Neubau den Wiedereinstieg prüfen.
-2. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
-3. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
-   manuell ausführen und das Ergebnis in [T006](../specs/002-projektstatus/tasks.md) festhalten.
+1. Die POSIX-Regression im aktuellen Codespace ausführen; der Test
+   `test_generated_post_create_runs_without_script_execute_permission`
+   muss erfolgreich laufen und darf unter Linux nicht übersprungen werden.
+2. Den Codespaces-Post-Create-Lauf in einer frischen Codespace-Umgebung
+   einschließlich Anmeldung und Wiedereinstieg nach Container-Neubau prüfen.
+3. Den Projektstatus bei Bedarf manuell über „Tasks: Run Task“ starten.
+   T006 bleibt offen; automatische Tasks sind auf Nutzerwunsch deaktiviert.
 
 ### Blockaden und Prüfstatus
 
-- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests
-  erfolgreich; erzeugte Projekte eingeschlossen. `git diff --check` erfolgreich.
-- Installationsschritte mit offiziellen GitHub-, nvm- und OpenAI-Anleitungen
-  abgeglichen; Codespace-Aufbau, Installation und Anmeldung nicht ausgeführt.
-- Keine Blockade; interaktive Startanzeige aus Feature 002 weiterhin ungeprüft.
+- Kein Ausführungsblocker für die Converge-Nachprüfung. `python scripts/check.py`
+  (17 Tests), `python -m unittest discover -s tests -v` (17 Tests),
+  `python scripts/check.py --static-only`, `specify workflow info
+  .specify/workflows/project-sdd/workflow.yml` und `git diff --check` waren
+  erfolgreich. Der vollständige Projekt-Workflow wurde damals nicht gestartet:
+  `.specify/feature.json` fehlte im Template-Arbeitsbaum; die geplanten
+  temporären CLI-Smokes für Validator und Gate wurden ausgeführt.
+- Direkte temporäre Validatorläufe lieferten bei offenem Befund Exit 1 mit
+  „Befund klären und den Bericht aktualisieren“ und bei fehlendem Status
+  Exit 1 mit dem Hinweis auf genau ein Statusfeld und die erlaubten Werte.
+- Der aktuelle `specs/004-analyze-gate/analyze.md`-Bericht wurde mit
+  temporär bereitgestelltem Feature-Kontext validiert; der Prüfer gab den
+  erwarteten relativen Berichtsweg zurück.
+- T006 aus Feature 002 bleibt offen: Windows-Desktop-VS-Code war am
+  25.10.2026 erreichbar. Nach Öffnen der Befehlspalette und Eingabe von
+  „Tasks: Manage Automatic Tasks in Folder“ wurde die Computersteuerung
+  durch Escape gestoppt. Weder Erlaubnis noch automatischer oder manueller
+  Tasklauf sind nachgewiesen. Anschließend wünschte der Nutzer ausschließlich
+  manuelle Starts; `.vscode/settings.json` setzt deshalb
+  `task.allowAutomaticTasks` ausdrücklich auf `off`. Die früher dokumentierte
+  reine Browser-Umgebung beschreibt einen älteren Prüfversuch.
+- Noch nicht ausgeführt: interaktive VS-Code-Startanzeige aus Feature 002 und
+  Codespaces-Post-Create-Lauf.
 - Frühere Ergebnisse und offene Laufzeitprüfungen stehen im [Prüfstatus](#prüfstatus).
 
 ## Inhalt
@@ -471,11 +580,14 @@ Die folgenden Beispiele gehören in den **Agenten-Chat**, nicht ins Terminal:
 | --- | --- | --- |
 | Codex | `$speckit-specify` | `.agents/skills/speckit-*/SKILL.md` |
 | GitHub Copilot im Standardmodus | `/speckit-specify` | `.github/skills/speckit-*/SKILL.md` |
+| GitHub Copilot mit Template-Agentenprofil | `/agent speckit-specify` | `.github/agents/speckit-*.agent.md` |
 
-Bei anderen Agenten oder abweichenden Installationsmodi die tatsächlich
-angebotenen Aufrufe verwenden. Die punktierte Schreibweise `/speckit.specify`
-aus älteren Anleitungen und Referenztexten gilt nicht pauschal für jede
-Integration. Die Schritte des [Feature-Ablaufs](#ablauf-je-feature) bleiben gleich.
+Die Modellwahl erfolgt im Chat mit `/model <modellname>`. Wenn für Unteragenten
+separate Vorgaben benötigt werden, diese über `/subagents` setzen. Bei anderen
+Agenten oder abweichenden Installationsmodi die tatsächlich angebotenen
+Aufrufe verwenden. Die punktierte Schreibweise `/speckit.specify` aus älteren
+Anleitungen und Referenztexten gilt nicht pauschal für jede Integration. Die
+Schritte des [Feature-Ablaufs](#ablauf-je-feature) bleiben gleich.
 
 #### Codex installieren
 
@@ -555,6 +667,29 @@ Projektordner und die installierte Integration prüfen und Codex neu starten;
 siehe [Skill-Erkennung in Codex](https://developers.openai.com/codex/skills).
 
 #### Bestehende Integrationen
+
+**Lokaler Windows-Stand vom 25.10.2026:** Codex ist installiert und wird von
+Spec Kit erkannt. Fehlt der `specify`-Starter im PATH, lässt sich dieselbe
+installierte CLI ohne erneute Installation aufrufen:
+
+```powershell
+python -c "from specify_cli import main; main()" integration status
+```
+
+Die Skriptausführung ist lokal standardmäßig gesperrt. Für die Vorprüfung
+genügt eine Richtlinie nur für den gestarteten Prozess; Benutzer- und
+Systemrichtlinien bleiben unverändert:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
+```
+
+Der aktuelle lokale Feature-Kontext verweist auf `specs/004-analyze-gate`.
+Automatische VS-Code-Tasks sind auf Nutzerwunsch über
+`task.allowAutomaticTasks: off` deaktiviert. Diese Einstellung steuert keine
+Agentenfreigaben für Terminalbefehle. Die fehlgeschlagene Sandbox-Einrichtung
+(`setup refresh had errors`) ist ein separates Problem der Agent-Umgebung;
+Projektdateien können diesen Fehler nicht nachweislich beheben.
 
 `specify integration list` zeigt installierte Integrationen. Fehlt Codex in
 einem bereits initialisierten Projekt, kann es mit
@@ -655,7 +790,7 @@ aufrufen und ihre Ergebnisse vor dem nächsten Schritt prüfen:
 | `$speckit-plan` | Technische Umsetzung in `plan.md` beschreiben; gewähltes Profil, vorhandene Architektur, Verträge, Migrationen und relevante Tests berücksichtigen. |
 | `$speckit-checklist` | Qualität, Eindeutigkeit und Vollständigkeit der Anforderungen prüfen; ersetzt keinen Test der Implementierung. |
 | `$speckit-tasks` | Ausführbare Aufgaben in `tasks.md` aus Spezifikation und Plan ableiten. |
-| `$speckit-analyze` | Constitution, Spezifikation, Plan und Aufgaben auf Konsistenz prüfen; wesentliche Befunde vor der Implementierung beheben. |
+| `$speckit-analyze` | Constitution, Spezifikation, Plan und Aufgaben auf Konsistenz prüfen; den Bericht im validierbaren `analyze.md`-Format mit Status, Begründung und Artefaktverweis bei `geklärt` festhalten. |
 | `$speckit-implement` | Geplante Aufgaben einschließlich Code und relevanter Tests umsetzen. |
 | `$speckit-converge` | Umsetzung und Artefakte gegen die Anforderungen prüfen; verbleibende Lücken in Aufgaben überführen. |
 
@@ -680,6 +815,28 @@ specify workflow run .specify/workflows/project-sdd/workflow.yml -i spec="Ein ab
 ```
 
 Vor dem automatisierten Lauf müssen fachliche Unklarheiten geklärt sein.
+Nach `analyze` prüft `scripts/check_analyze_gate.py` den aktiven
+Featurepfad aus `.specify/feature.json` und dessen `analyze.md`. Fehlender
+Kontext, fehlender/unlesbarer Bericht, unbekannte oder fehlende Statusangaben
+und offene wesentliche Befunde stoppen den Workflow vor dem Gate und vor
+`implement`. Es gibt keinen stillen Fallback auf einen anderen Featurepfad.
+
+Der Bericht enthält `## Wesentliche Befunde`. Jeder Befund erhält den Status
+`offen`, `geklärt` oder `akzeptiert` und eine Begründung; bei `geklärt` ist
+`Geändertes Artefakt` erforderlich. Wenn keine wesentlichen Befunde vorliegen,
+steht exakt `Keine wesentlichen Befunde.` im Abschnitt. Als wesentlich gelten
+Auswirkungen auf Akzeptanzkriterien, Schnittstellen, Daten, Sicherheit oder
+Betrieb. Nur ein erfolgreich validierter Bericht wird am anschließenden Gate
+angezeigt. Dort ist weiterhin eine ausdrückliche Freigabe erforderlich;
+`approve` kann keine offenen Befunde übersteuern.
+
+Im Befundabschnitt steht vor der ersten Befundüberschrift nur Leerraum.
+Befunde beginnen ohne Einrückung mit `### A001 — P1: ...`; falsch eingerückte
+oder tiefere Überschriften werden zurückgewiesen. Pflichtfeldwerte beginnen
+auf derselben Zeile wie das Feld; die folgende Feldzeile ersetzt keinen leeren
+Wert. Der Devcontainer startet sein Post-Create-Skript ausdrücklich über Bash,
+damit auch generierte Dateien ohne Ausführungsbit funktionieren.
+
 `converge` kann weitere Aufgaben erzeugen. Der abschließende Review prüft diese
 Aufgaben; ein durchgelaufener Workflow allein bedeutet keine fachliche Abnahme.
 Bei Lücken Implementierung, Prüfungen und Abgleich wiederholen.
@@ -801,6 +958,44 @@ Katalog aufnehmen. Projektanforderungen, aktive Konfiguration und dieses
 Dokument bei Änderungen zusammenführen.
 
 ## Prüfstatus
+
+### Review-Korrekturen – 25.10.2026
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Umgebung | Windows-Desktop, PowerShell, Python 3.13; keine PC-Steuerung |
+| Vorprüfung und Hooks | Feature 004 und `tasks.md` erkannt; keine Checklisten und keine konfigurierten Erweiterungshooks |
+| Regressionen vor der Korrektur | Elf fehlerhafte Unterfälle nachgewiesen: vier leere Pflichtfelder, drei unerkannte Befunde, vier Profilkonfigurationen mit direktem Skriptaufruf |
+| `python scripts/check.py` | Dokumentlinks und Dateisyntax erfolgreich; 20 Tests erfasst, davon 19 erfolgreich und einer unter Windows übersprungen |
+| POSIX-Regression | Prüft den konfigurierten Post-Create-Aufruf eines generierten Skripts mit Modus 0644 und lokalem Copilot-Platzhalter; benötigt POSIX/Bash und wurde hier nicht ausgeführt |
+| `git diff --check`, `integration status` | Erfolgreich; Integration ohne fehlende oder veränderte verwaltete Dateien |
+| Tatsächlicher Containerstart / Copilot-Installation | Nicht ausgeführt; Generatorprüfung ersetzt diesen Lauf nicht |
+| T006 und automatische Tasks | Weiterhin offen beziehungsweise auf Nutzerwunsch deaktiviert; kein automatischer Tasklauf ausgeführt |
+
+### Bereinigung und Feature-Vorprüfung – 25.10.2026, 16:07 Uhr MEZ
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Umgebung | Windows-Desktop, PowerShell und Python 3.13; keine PC-Steuerung für diese Bereinigung |
+| `integration status` | OK; keine fehlenden oder veränderten verwalteten Dateien |
+| PowerShell-Vorprüfung | Mit prozessgebundenem `RemoteSigned` erfolgreich; Feature 002 und `tasks.md` erkannt, ohne erneute Umgebungsvariable |
+| `python scripts/check.py` | Dokumentlinks, Dateisyntax und alle 17 Tests erfolgreich |
+| `git diff --check` | Erfolgreich; Konfliktmarkierungen im DV-Konzept entfernt |
+| Automatische Tasks / T006 | Auf Nutzerwunsch `off`; kein automatischer oder manueller Tasklauf nachgewiesen, T006 bleibt offen |
+| Noch offen | Codespaces-Post-Create-Lauf, Container-Neubau und Anmeldung nicht interaktiv geprüft; Sandbox-Prozessstart weiterhin fehlerhaft |
+
+### Spec-Kit-Aktivierung – 25.10.2026
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Umgebung | Windows-Desktop, PowerShell, Python 3.13, Spec Kit 1.0.7 |
+| Codex-Installation | `integration install codex --script ps` erfolgreich; Aufruf über `python -c "from specify_cli import main; main()"`, weil `specify` im PATH fehlt |
+| `integration status` | OK; Codex als Standard, keine fehlenden oder veränderten verwalteten Dateien |
+| `python scripts/check.py --static-only` | Dokumentlinks und Dateisyntax erfolgreich |
+| `python scripts/check.py` | Dokumentlinks, Dateisyntax und 17 Tests erfolgreich; vier Technologieprofile und API-Rezept erzeugt und geprüft |
+| Erster Testlauf | Vier Unterfälle scheiterten an implizitem cp1252 beim Lesen von UTF-8; nach expliziter UTF-8-Angabe erfolgreich |
+| Desktop-/Codespaces-Agentenchat und Container-Post-Create | In dieser Sitzung nicht interaktiv ausgeführt; Hinweise ergänzt und Übernahme des Post-Create-Skripts automatisiert geprüft |
+| Bestehender Mergezustand | Konfliktmarkierungen erhalten; erfolgreiche statische Prüfung bedeutet keine Konfliktauflösung |
 
 ### Codespace-Einstieg und Agent-Einrichtung – 24.09.2026
 

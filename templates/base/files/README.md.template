@@ -13,6 +13,26 @@ Beim Erzeugen dieses Projekts über GitHub **Include all branches** aktivieren,
 damit `main` und `development` aus dem Template übernommen werden. Ohne diese
 Option wird nur `main` kopiert.
 
+## Spec Kit aktivieren: Desktop und Codespaces
+
+Die Agentenprofile und Projektvorlagen sind enthalten. Die Spec-Kit-Integration
+wird einmal je Projekt eingerichtet; Anleitung und Prüfung stehen unter
+[Spec Kit](docs/DV_KONZEPT.md#spec-kit).
+
+- **Desktop-VS-Code mit Codex:** Den PowerShell-Ablauf der Anleitung ausführen,
+  danach eine neue Codex-Sitzung im Projekt öffnen und beispielsweise
+  `$speckit-specify` mit dem Feature-Auftrag senden.
+- **GitHub Codespaces mit Copilot:** Nach der
+  [Agent-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace) einmalig im
+  Bash-Terminal `python scripts/init_speckit.py --integration copilot` ausführen.
+  Danach im Copilot-Chat `/speckit-specify` verwenden. In VS Code können die
+  mitgelieferten `speckit-*`-Profile auch über die Agentenauswahl im Copilot-Chat
+  gewählt werden.
+
+Zuerst `specify integration list` prüfen. Bei bereits eingerichteter Integration
+die versionierten Dateien weiterverwenden; ein neuer Codespace erfordert keine
+erneute Initialisierung. Zusätzliche Integrationen gemäß Anleitung installieren.
+
 ## Neuer Codespace: Copilot oder Codex starten
 
 Dieser Einstieg gilt für neue und bestehende Projekte sowie für jeden neu

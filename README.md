@@ -10,6 +10,27 @@ Kern wird mit einem Technologieprofil und den benötigten Diensten kombiniert.
 **Projektziel, Architektur, Entwicklung und Betrieb stehen zusammen im
 [DV-Konzept](docs/DV_KONZEPT.md).**
 
+## Spec Kit aktivieren: Desktop und Codespaces
+
+Die Agentenprofile und Projektvorlagen sind enthalten. Die Spec-Kit-Integration
+wird je Projekt eingerichtet; ein neuer Codespace erfordert keine erneute
+Initialisierung einer bereits versionierten Integration.
+
+- **Desktop-VS-Code mit Codex:** Der [Windows-Ablauf](docs/DV_KONZEPT.md#codex-mit-windows-powershell-initialisieren)
+  richtet die Skills ein. Danach eine neue Codex-Sitzung im Projekt öffnen und
+  beispielsweise `$speckit-specify` mit dem Feature-Auftrag senden.
+- **GitHub Codespaces mit Copilot:** Die [Codespace-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace)
+  und die [Agent-Integration](docs/DV_KONZEPT.md#agent-integration-und-chat-aufrufe)
+  durchführen; im Bash-Terminal einmalig `python scripts/init_speckit.py --integration copilot`
+  ausführen. Danach im Copilot-Chat `/speckit-specify` verwenden. In VS Code
+  können die mitgelieferten `speckit-*`-Profile auch über die Agentenauswahl
+  im Copilot-Chat gewählt werden.
+
+Mit `specify integration list` den vorhandenen Zustand zuerst prüfen. Für eine
+zusätzliche Integration die [Integrationsverwaltung](docs/DV_KONZEPT.md#bestehende-integrationen)
+verwenden. GitHubs **Use this template** kopiert das Repository; der
+[Generator](#2-ein-eigenes-projekt-erzeugen) erstellt daraus das Anwendungsprojekt.
+
 ## Neuer Codespace: Copilot oder Codex starten
 
 Dieser Einstieg gilt für neue und bestehende Projekte sowie für jeden neu
@@ -158,6 +179,10 @@ und ruft intern `specify init --here --integration codex --script sh --force`
 auf. Verwende es für die Arbeit im Linux-Container. Für native PowerShell gilt
 der obige Block mit `--script ps`. Wähle einen der beiden Wege.
 
+**GitHub Codespaces:** Die GitHub Copilot CLI wird beim Erstellen automatisch
+installiert. Starte sie mit `copilot`; die erstmalige Anmeldung führst du
+selbst über `/login` aus.
+
 Nach erfolgreicher Initialisierung im Projekt-Terminal prüfen:
 
 ```sh
@@ -224,6 +249,9 @@ $speckit-analyze
 $speckit-implement
 $speckit-converge
 ```
+
+Für Copilot sind die passenden Profile unter `.github/agents/` verfügbar,
+einschließlich des Abschlussprofils `speckit-converge`.
 
 Zweck und Ergebnisse der Schritte beschreibt der
 [Feature-Ablauf im DV-Konzept](docs/DV_KONZEPT.md#manueller-ablauf-mit-codex).
