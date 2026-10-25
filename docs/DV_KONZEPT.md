@@ -1,6 +1,6 @@
 # DV-Konzept: template-spec-kit
 
-**Stand:** 23.09.2026
+**Stand:** 25.10.2026
 **Status:** Projektgrundgerüst mit optionalen Technologie- und Dienstbausteinen
 
 Dieses Dokument ist die verbindliche Beschreibung von Projektziel, Architektur,
@@ -10,9 +10,10 @@ werden nicht gepflegt.
 
 ## Aktueller Arbeitsstand
 
-**Stand:** 2026-09-23
+**Stand:** 2026-10-25
 
-**Aktives Feature:** Kein neues Feature; Dokumentationspflege zu Spec Kit abgeschlossen.
+**Aktives Feature:** Kein neues Feature; Codespaces-Integration der GitHub
+Copilot CLI ergänzt.
 
 ### Zuletzt erledigt
 
@@ -23,24 +24,34 @@ werden nicht gepflegt.
 - Befehlerklärungen, Agentenaufrufe und den Umgang mit vorhandenen Unterlagen
   in dieses Konzept und die Projektvorlagen übernommen; zwei überholte
   Spec-Kit-Rohdateien entfernt. [Auswertung und Verbleib](raw-materials/README.md#auswertung-der-spec-kit-unterlagen-am-23092026).
+- GitHub Copilot CLI als idempotentes Devcontainer-Post-Create-Skript
+  eingerichtet, in GitHub Codespaces eingebunden und die VS-Code-Erweiterung
+  ergänzt; [Devcontainer-Konfiguration](../.devcontainer/devcontainer.json).
 
 ### Aktuell in Arbeit
 
-- Keine laufende Umsetzung. Die manuelle Startprüfung aus Feature 002 bleibt offen.
+- Keine laufende Umsetzung. Die manuelle Startprüfung aus Feature 002 und die
+  erste Ausführung des neuen Codespaces-Post-Create-Skripts bleiben offen.
 
 ### Nächste Schritte
 
 1. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
 2. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
    manuell ausführen und das Ergebnis in [T006](../specs/002-projektstatus/tasks.md) festhalten.
+3. Einen neuen GitHub Codespace erstellen und prüfen, dass `copilot --version`
+   nach dem Post-Create-Schritt verfügbar ist; die Anmeldung bleibt
+   benutzerspezifisch.
 
 ### Blockaden und Prüfstatus
 
 - `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests nach
-  Übernahme der Erklärungen erfolgreich; auch erzeugte Projekte geprüft.
+  Ergänzung der Codespaces-Integration erfolgreich; auch erzeugte Projekte geprüft.
+- `.devcontainer/devcontainer.json` mit `python -m json.tool` und
+  `.devcontainer/post-create.sh` mit `bash -n` erfolgreich geprüft.
 - Spec-Kit-Befehle anhand der Referenz für 1.0.7 abgeglichen;
   Initialisierung und Agenten-Chat nicht erneut ausgeführt.
-- Keine Blockade; interaktive Startanzeige aus Feature 002 weiterhin ungeprüft.
+- Keine Blockade; interaktive Startanzeige aus Feature 002 und tatsächlicher
+  Codespaces-Post-Create-Lauf weiterhin ungeprüft.
 - Frühere Ergebnisse und offene Laufzeitprüfungen stehen im [Prüfstatus](#prüfstatus).
 
 ## Inhalt

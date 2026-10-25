@@ -136,6 +136,10 @@ und ruft intern `specify init --here --integration codex --script sh --force`
 auf. Verwende es für die Arbeit im Linux-Container. Für native PowerShell gilt
 der obige Block mit `--script ps`. Wähle einen der beiden Wege.
 
+**GitHub Codespaces:** Die GitHub Copilot CLI wird beim Erstellen automatisch
+installiert. Starte sie mit `copilot`; die erstmalige Anmeldung führst du
+selbst über `/login` aus.
+
 Nach erfolgreicher Initialisierung im Projekt-Terminal prüfen:
 
 ```sh

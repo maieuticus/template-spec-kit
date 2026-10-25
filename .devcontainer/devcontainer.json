@@ -8,6 +8,7 @@
   "shutdownAction": "stopCompose",
   "runServices": ["dev"],
   "initializeCommand": ["python", "scripts/container_init.py"],
+  "postCreateCommand": ".devcontainer/post-create.sh",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
@@ -23,7 +24,11 @@
       }
     },
     "vscode": {
-      "extensions": ["redhat.vscode-yaml", "yzhang.markdown-all-in-one"]
+      "extensions": [
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one",
+        "GitHub.copilot"
+      ]
     }
   }
 }
