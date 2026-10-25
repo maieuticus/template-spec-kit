@@ -12,8 +12,8 @@ werden nicht gepflegt.
 
 **Stand:** 2026-10-25
 
-**Aktives Feature:** Kein neues Feature; Feature 003 – Schrittführung,
-Modellempfehlung und Template-Issue-Routing abgeschlossen.
+**Aktives Feature:** [004 – Analyze-Gate vor Implementierung](../specs/004-analyze-gate/spec.md);
+implementiert und geprüft; [Aufgaben](../specs/004-analyze-gate/tasks.md).
 
 ### Zuletzt erledigt
 
@@ -31,34 +31,85 @@ Modellempfehlung und Template-Issue-Routing abgeschlossen.
   Modell-/Reasoning-Empfehlungen und Template-Issue-Routing ergänzt; die
   Anweisung wird auch in Standard- und API-Projekte übernommen.
   [Aufgaben von Feature 003](../specs/003-sdd-issue-routing/tasks.md).
+- Konkrete Modellnamen samt Stufen für Empfehlungen in den allgemeinen und
+  generierten Copilot-Anweisungen festgelegt; zugehörigen Generatortest ergänzt.
+- Nächste-Schritt-Empfehlung als Karte mit Schritt, Ziel, Agent, Modell,
+  Reasoning und prüfbarem Ergebnis festgelegt; nun als statusmarkierte
+  Aktions-, Entscheidungs- oder Blockadekarte mit konkreten Feldern umgesetzt
+  und durch Generatortests abgesichert.
+- Sieben fachneutrale Agentenprofile unter `.github/agents/` ergänzt und in die
+  Projekterzeugung übernommen.
+- Das fehlende `speckit-converge`-Profil ergänzt, im README auffindbar gemacht
+  und in Generator-Regressionen für alle Projektprofile abgesichert;
+  [Aufgaben von Feature 003](../specs/003-sdd-issue-routing/tasks.md).
+- Feature 004 spezifiziert und den technischen Plan für das Gate zwischen
+  Analyze und Implementierung erstellt; [Plan](../specs/004-analyze-gate/plan.md).
+- Aufgaben für Feature 004 aus Spezifikation und Plan abgeleitet;
+  [Aufgaben](../specs/004-analyze-gate/tasks.md).
+- Feature 004 fail-closed umgesetzt: Analysebericht, Feature-Kontext und
+  Befundstatus werden vor dem manuellen Gate validiert; A001–A003 sind gemäß
+  [Analyse](../specs/004-analyze-gate/analyze.md) geklärt.
+- Agentenprofil, DV-Konzept, Basistemplate, Generator und Regressionstests
+  verwenden denselben Berichtvertrag.
+- Spec-Kit-CLI-Smokes für offenen und fehlenden Bericht, `reject` und
+  `approve` dokumentiert; Workflow mit Spec Kit 1.0.7 erkannt.
+- `python scripts/check.py`: Dokumentlinks und Dateisyntax erfolgreich,
+  17 Tests bestanden; `--static-only` und `git diff --check` ebenfalls
+  erfolgreich.
+- Converge-Nachprüfung für Feature 004: `python -m unittest discover -s tests
+  -v` bestand ebenfalls mit 17 Tests. Spec-Kit CLI `1.0.7` erkannte den
+  Workflow mit zehn Schritten; `python scripts/check.py` und
+  `python scripts/check.py --static-only` waren erfolgreich.
+- Temporäre CLI-Smokes (Validator → Gate → Sentinel) mit expliziter
+  Testauswahl: Run `d4df1f0b` blockierte einen offenen Befund vor dem Gate,
+  Run `2fcb7501` einen fehlenden Bericht; beide ohne Sentinel. Run `998fc537`
+  endete bei `reject` abgebrochen ohne Sentinel. Run `6475c839` lief nach
+  `approve` eines geklärten Befunds bis zum Sentinel durch; Run `04fa9eca`
+  bestätigte denselben Pfad für den ausdrücklich markierten Leerbefund.
+  `verdict_input` diente nur zur nichtinteraktiven Auswahl im temporären
+  Smoke-Workflow.
+- T011/T012 aus dem Converge-Abgleich umgesetzt: Workflow- und Analyze-Profil
+  enthalten nun dieselben Wesentlichkeitskriterien (Akzeptanzkriterien,
+  Schnittstellen, Daten, Sicherheit, Betrieb; redaktionelle Befunde
+  blockieren nicht), und der fehlende Befundstatus ist als fail-closed-
+  Regressionstest abgedeckt.
 
 ### Aktuell in Arbeit
 
-- Keine laufende Umsetzung. Die manuellen Prüfungen aus Feature 002 und der
-  Codespaces-Integration bleiben offen.
+- Feature 004 ist implementiert und vollständig regressionsgesichert.
+- Die interaktive VS-Code-Startanzeige aus Feature 002 und der tatsächliche
+  Codespaces-Post-Create-Lauf bleiben ungeprüft; siehe
+  [Aufgaben von Feature 002](../specs/002-projektstatus/tasks.md).
 
 ### Nächste Schritte
 
-1. In VS Code automatische Aufgaben für den vertrauenswürdigen Workspace erlauben.
-2. Beim erneuten Öffnen die Startanzeige prüfen, zusätzlich „Projektstatus anzeigen“
-   manuell ausführen und das Ergebnis in [T006](../specs/002-projektstatus/tasks.md) festhalten.
-3. Einen neuen GitHub Codespace erstellen und prüfen, dass `copilot --version`
-   nach dem Post-Create-Schritt verfügbar ist; die Anmeldung bleibt
-   benutzerspezifisch.
+1. Die interaktive VS-Code-Startanzeige gemäß
+   [T006 von Feature 002](../specs/002-projektstatus/tasks.md) prüfen.
+2. Den Codespaces-Post-Create-Lauf in einer frischen Codespace-Umgebung
+   prüfen und den tatsächlichen Status dokumentieren.
 
 ### Blockaden und Prüfstatus
 
-- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests nach
-  Ergänzung der Codespaces-Integration erfolgreich; auch erzeugte Projekte geprüft.
-- `.devcontainer/devcontainer.json` mit `python -m json.tool` und
-  `.devcontainer/post-create.sh` mit `bash -n` erfolgreich geprüft.
-- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests nach
-  Feature 003 erfolgreich; Standard- und API-Projekte mit den neuen
-  Copilot-Anweisungen erzeugt.
-- Spec-Kit-Befehle anhand der Referenz für 1.0.7 abgeglichen;
-  Initialisierung und Agenten-Chat nicht erneut ausgeführt.
-- Keine Blockade; interaktive Startanzeige aus Feature 002 und tatsächlicher
-  Codespaces-Post-Create-Lauf weiterhin ungeprüft.
+- Kein Ausführungsblocker für die Converge-Nachprüfung. `python scripts/check.py`
+  (17 Tests), `python -m unittest discover -s tests -v` (17 Tests),
+  `python scripts/check.py --static-only`, `specify workflow info
+  .specify/workflows/project-sdd/workflow.yml` und `git diff --check` waren
+  erfolgreich. Der vollständige Projekt-Workflow wurde nicht gestartet:
+  `.specify/feature.json` fehlt im Template-Arbeitsbaum; die geplanten
+  temporären CLI-Smokes für Validator und Gate wurden ausgeführt.
+- Direkte temporäre Validatorläufe lieferten bei offenem Befund Exit 1 mit
+  „Befund klären und den Bericht aktualisieren“ und bei fehlendem Status
+  Exit 1 mit dem Hinweis auf genau ein Statusfeld und die erlaubten Werte.
+- Der aktuelle `specs/004-analyze-gate/analyze.md`-Bericht wurde mit
+  temporär bereitgestelltem Feature-Kontext validiert; der Prüfer gab den
+  erwarteten relativen Berichtsweg zurück.
+- T006 aus Feature 002 bleibt offen: In dieser Sitzung ist nur die Browser-
+  basierte `code`-CLI verfügbar (`code --status`: „not yet supported in
+  browsers“, `DISPLAY` ist nicht gesetzt). Der interaktive Nachweis für
+  Ordneröffnen, Reopen und manuelle Task-Ausführung kann hier nicht
+  reproduzierbar automatisiert werden.
+- Noch nicht ausgeführt: interaktive VS-Code-Startanzeige aus Feature 002 und
+  Codespaces-Post-Create-Lauf.
 - Frühere Ergebnisse und offene Laufzeitprüfungen stehen im [Prüfstatus](#prüfstatus).
 
 ## Inhalt
@@ -340,11 +391,14 @@ Die folgenden Beispiele gehören in den **Agenten-Chat**, nicht ins Terminal:
 | --- | --- | --- |
 | Codex | `$speckit-specify` | `.agents/skills/speckit-*/SKILL.md` |
 | GitHub Copilot im Standardmodus | `/speckit-specify` | `.github/skills/speckit-*/SKILL.md` |
+| GitHub Copilot mit Template-Agentenprofil | `/agent speckit-specify` | `.github/agents/speckit-*.agent.md` |
 
-Bei anderen Agenten oder abweichenden Installationsmodi die tatsächlich
-angebotenen Aufrufe verwenden. Die punktierte Schreibweise `/speckit.specify`
-aus älteren Anleitungen und Referenztexten gilt nicht pauschal für jede
-Integration. Die Schritte des [Feature-Ablaufs](#ablauf-je-feature) bleiben gleich.
+Die Modellwahl erfolgt im Chat mit `/model <modellname>`. Wenn für Unteragenten
+separate Vorgaben benötigt werden, diese über `/subagents` setzen. Bei anderen
+Agenten oder abweichenden Installationsmodi die tatsächlich angebotenen
+Aufrufe verwenden. Die punktierte Schreibweise `/speckit.specify` aus älteren
+Anleitungen und Referenztexten gilt nicht pauschal für jede Integration. Die
+Schritte des [Feature-Ablaufs](#ablauf-je-feature) bleiben gleich.
 
 #### Codex installieren
 
@@ -524,7 +578,7 @@ aufrufen und ihre Ergebnisse vor dem nächsten Schritt prüfen:
 | `$speckit-plan` | Technische Umsetzung in `plan.md` beschreiben; gewähltes Profil, vorhandene Architektur, Verträge, Migrationen und relevante Tests berücksichtigen. |
 | `$speckit-checklist` | Qualität, Eindeutigkeit und Vollständigkeit der Anforderungen prüfen; ersetzt keinen Test der Implementierung. |
 | `$speckit-tasks` | Ausführbare Aufgaben in `tasks.md` aus Spezifikation und Plan ableiten. |
-| `$speckit-analyze` | Constitution, Spezifikation, Plan und Aufgaben auf Konsistenz prüfen; wesentliche Befunde vor der Implementierung beheben. |
+| `$speckit-analyze` | Constitution, Spezifikation, Plan und Aufgaben auf Konsistenz prüfen; den Bericht im validierbaren `analyze.md`-Format mit Status, Begründung und Artefaktverweis bei `geklärt` festhalten. |
 | `$speckit-implement` | Geplante Aufgaben einschließlich Code und relevanter Tests umsetzen. |
 | `$speckit-converge` | Umsetzung und Artefakte gegen die Anforderungen prüfen; verbleibende Lücken in Aufgaben überführen. |
 
@@ -549,6 +603,21 @@ specify workflow run .specify/workflows/project-sdd/workflow.yml -i spec="Ein ab
 ```
 
 Vor dem automatisierten Lauf müssen fachliche Unklarheiten geklärt sein.
+Nach `analyze` prüft `scripts/check_analyze_gate.py` den aktiven
+Featurepfad aus `.specify/feature.json` und dessen `analyze.md`. Fehlender
+Kontext, fehlender/unlesbarer Bericht, unbekannte oder fehlende Statusangaben
+und offene wesentliche Befunde stoppen den Workflow vor dem Gate und vor
+`implement`. Es gibt keinen stillen Fallback auf einen anderen Featurepfad.
+
+Der Bericht enthält `## Wesentliche Befunde`. Jeder Befund erhält den Status
+`offen`, `geklärt` oder `akzeptiert` und eine Begründung; bei `geklärt` ist
+`Geändertes Artefakt` erforderlich. Wenn keine wesentlichen Befunde vorliegen,
+steht exakt `Keine wesentlichen Befunde.` im Abschnitt. Als wesentlich gelten
+Auswirkungen auf Akzeptanzkriterien, Schnittstellen, Daten, Sicherheit oder
+Betrieb. Nur ein erfolgreich validierter Bericht wird am anschließenden Gate
+angezeigt. Dort ist weiterhin eine ausdrückliche Freigabe erforderlich;
+`approve` kann keine offenen Befunde übersteuern.
+
 `converge` kann weitere Aufgaben erzeugen. Der abschließende Review prüft diese
 Aufgaben; ein durchgelaufener Workflow allein bedeutet keine fachliche Abnahme.
 Bei Lücken Implementierung, Prüfungen und Abgleich wiederholen.

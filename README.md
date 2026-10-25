@@ -207,6 +207,9 @@ $speckit-implement
 $speckit-converge
 ```
 
+Für Copilot sind die passenden Profile unter `.github/agents/` verfügbar,
+einschließlich des Abschlussprofils `speckit-converge`.
+
 Zweck und Ergebnisse der Schritte beschreibt der
 [Feature-Ablauf im DV-Konzept](docs/DV_KONZEPT.md#manueller-ablauf-mit-codex).
 Die Artefakte gehören nach `specs/<nummer>-<name>/`. Prüfe das Ergebnis gegen

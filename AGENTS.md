@@ -37,14 +37,34 @@
 - Jede inhaltliche Antwort und jeder ausgeführte Spec-Kit-Schritt nennt genau
   einen nächsten konkreten Schritt. Erst nach dessen Ergebnis wird der folgende
   Schritt bestimmt.
-- Nenne je Schritt ein in der aktiven Agent-Umgebung auswählbares
-  Modellprofil und die Reasoning-Stufe: `clarify` und `checklist` nutzen ein
-  schnelles allgemeines Modell mit niedriger Stufe; `specify` und `tasks` ein
-  Coding-Modell mit mittlerer Stufe; `plan`, `analyze` und `converge` ein
-  reasoning-starkes Coding-Modell mit hoher Stufe; `implement` ein
-  Coding-Modell mit mittlerer Stufe, bei Architektur-, Sicherheits- oder
-  Migrationsänderungen mit hoher Stufe. Wenn keine Modellauswahl verfügbar
-  ist, benenne das Plattform-Standardmodell und die empfohlene Stufe.
+- Stelle den nächsten Schritt als genau eine kompakte, statusmarkierte Karte dar.
+  Wähle `▶ Nächste Aktion`, wenn die Arbeit ohne Rückfrage fortgesetzt werden
+  kann; `⏸ Entscheidung benötigt`, wenn eine konkrete Nutzerentscheidung
+  erforderlich ist; oder `⛔ Blockiert`, wenn ein Hindernis die Arbeit stoppt.
+  Frage nicht nach Bestätigung für sichere, reversible und vom Auftrag
+  gedeckte Arbeit. Stelle bei einer Entscheidung nur die notwendige Frage.
+- Die Karte `▶ Nächste Aktion — <Schritt>` enthält **Aktion**, **Fertig, wenn**
+  und **Ausführung**. `⏸ Entscheidung benötigt — <Thema>` enthält
+  **Entscheidung**, **Warum jetzt** und **Danach**. `⛔ Blockiert — <Thema>`
+  enthält **Blocker**, **Aufhebung** und **Danach**. `Danach` erscheint nur bei
+  Entscheidungen oder Blockaden. Formuliere Aktion und Abschlusskriterium
+  konkret; nenne unter Ausführung die konkrete Agentenrolle bzw. das Profil,
+  den exakten Modellnamen und die Reasoning-Stufe, kompakt in einer Zeile.
+- Nenne je Schritt das konkrete, in der aktiven Agent-Umgebung auswählbare
+  Modell samt Reasoning-Stufe; allgemeine Kategorien wie „Coding-Modell“ allein
+  reichen nicht. Verwende, sofern auswählbar, `claude-haiku-5.5` mit niedriger
+  Stufe für `clarify` und `checklist`, `gpt-5.3-codex` mit mittlerer Stufe für
+  `specify`, `tasks` und `implement` sowie `gpt-6-luna` mit hoher Stufe für
+  `plan`, `analyze` und `converge`. Für Architektur-, Sicherheits- oder
+  Migrationsänderungen bei `implement` verwende `gpt-6-luna` mit hoher Stufe.
+  Ist ein empfohlenes Modell nicht auswählbar, nenne stattdessen den exakten
+  Namen des verfügbaren Plattform-Standardmodells und die empfohlene Stufe;
+  „Standardmodell“ ohne Modellnamen genügt nicht.
+- Beispiel für die Ausgabe:
+  **▶ Nächste Aktion — Specify**
+  **Aktion:** Anforderungen und Akzeptanzkriterien für Feature 004 festlegen.
+  **Fertig, wenn:** `specs/004-.../spec.md` prüfbar vorliegt.
+  **Ausführung:** `speckit-specify` · `gpt-5.3-codex` · Reasoning mittel.
 - Fachliche Ziele, Prioritäten, Domänenbegriffe und Produktentscheidungen
   gehören ausschließlich in das jeweilige Projekt, sein DV-Konzept und seine
   Feature-Artefakte. Sie sind keine Template-Verbesserungen.

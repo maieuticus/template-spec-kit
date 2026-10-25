@@ -210,7 +210,10 @@ Codex-Skills unter `.agents/skills/`, Copilot-Skills standardmäßig unter
 | --- | --- |
 | Codex | `$speckit-specify` |
 | GitHub Copilot, Standardmodus | `/speckit-specify` |
+| GitHub Copilot mit Template-Agentenprofil | `/agent speckit-specify` |
 
+Für die Modellwahl im Chat `/model <modellname>` nutzen; falls die Umgebung
+Profilvorgaben für Unteragenten verwendet, diese über `/subagents` setzen.
 Bei anderen Agenten oder Installationsmodi die dort angebotene Schreibweise
 verwenden; `/speckit.specify` aus Referenztexten gilt nicht für jede Integration.
 Siehe [Integrationsreferenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md).
@@ -272,14 +275,18 @@ Details bleiben in den verlinkten Feature-Aufgaben und Prüfergebnissen.
 ### Schrittführung, Modellempfehlung und Template-Verbesserungen
 
 Jede inhaltliche Agentenantwort und jeder Spec-Kit-Schritt nennt genau einen
-nächsten konkreten Schritt. Dafür wird ein in der aktiven Umgebung auswählbares
-Modellprofil mit Reasoning-Stufe empfohlen: `clarify` und `checklist` verwenden
-ein schnelles allgemeines Modell mit niedriger Stufe; `specify` und `tasks` ein
-Coding-Modell mit mittlerer Stufe; `plan`, `analyze` und `converge` ein
-reasoning-starkes Coding-Modell mit hoher Stufe; `implement` ein Coding-Modell
-mit mittlerer Stufe, bei Architektur-, Sicherheits- oder Migrationsänderungen
-mit hoher Stufe. Ist keine Modellauswahl verfügbar, wird das
-Plattform-Standardmodell mit der empfohlenen Stufe benannt.
+nächsten konkreten Schritt als statusmarkierte Karte: `▶ Nächste Aktion`,
+`⏸ Entscheidung benötigt` oder `⛔ Blockiert`. Die Karte enthält je nach Status
+die festgelegten Pflichtfelder und bei Ausführung immer den konkreten Agenten,
+den exakten Modellnamen und die Reasoning-Stufe in einer Zeile.
+
+Sofern auswählbar gelten diese Modell-/Reasoning-Empfehlungen:
+`clarify` und `checklist` mit `claude-haiku-5.5` (niedrig),
+`specify`, `tasks` und `implement` mit `gpt-5.3-codex` (mittel),
+`plan`, `analyze` und `converge` mit `gpt-6-luna` (hoch). Für Architektur-,
+Sicherheits- oder Migrationsänderungen bei `implement` `gpt-6-luna` (hoch)
+verwenden. Ist ein Modell nicht verfügbar, den exakten Namen des verfügbaren
+Standardmodells nennen.
 
 Fachliche Ziele, Prioritäten, Domänenbegriffe und Produktentscheidungen bleiben
 in diesem Projekt, seinem DV-Konzept und seinen Feature-Artefakten. Nur
@@ -313,7 +320,7 @@ Spec-Kit-Schritte im Agenten-Chat aufrufen:
 | `plan` | Technische Umsetzung und Prüfungen in `plan.md` begründen. |
 | `checklist` | Nach Bedarf Klarheit und Vollständigkeit der Anforderungen prüfen. |
 | `tasks` | Ausführbare Aufgaben aus Spec und Plan in `tasks.md` ableiten. |
-| `analyze` | Vor größeren Umsetzungen Konsistenz und wesentliche Lücken prüfen. |
+| `analyze` | Vor größeren Umsetzungen Konsistenz und wesentliche Lücken prüfen; den validierbaren Bericht in `analyze.md` mit Status, Begründung und geändertem Artefakt bei `geklärt` festhalten. |
 | `implement` | Aufgaben einschließlich relevanter Tests umsetzen. |
 | `converge` | Umsetzung mit Anforderungen abgleichen; offene Lücken nacharbeiten. |
 
@@ -335,6 +342,21 @@ Der vorbereitete Workflow kann nach Klärung der Anforderungen ausgeführt werde
 ```sh
 specify workflow run .specify/workflows/project-sdd/workflow.yml -i spec="Ein kleines Feature"
 ```
+
+Nach `analyze` prüft `scripts/check_analyze_gate.py` den aktiven
+Featurepfad aus `.specify/feature.json` und dessen `analyze.md`. Fehlender
+Kontext, fehlender/unlesbarer Bericht, unbekannte oder fehlende Statusangaben
+und offene wesentliche Befunde stoppen den Workflow vor dem Gate und vor
+`implement`. Es gibt keinen stillen Fallback auf einen anderen Featurepfad.
+
+Der Bericht enthält `## Wesentliche Befunde`. Jeder Befund erhält den Status
+`offen`, `geklärt` oder `akzeptiert` und eine Begründung; bei `geklärt` ist
+`Geändertes Artefakt` erforderlich. Wenn keine wesentlichen Befunde vorliegen,
+steht exakt `Keine wesentlichen Befunde.` im Abschnitt. Als wesentlich gelten
+Auswirkungen auf Akzeptanzkriterien, Schnittstellen, Daten, Sicherheit oder
+Betrieb. Nur ein erfolgreich validierter Bericht wird am anschließenden Gate
+angezeigt. Dort ist weiterhin eine ausdrückliche Freigabe erforderlich;
+`approve` kann keine offenen Befunde übersteuern.
 
 Der abschließende Review prüft offene Aufgaben aus `converge` und das
 DV-Konzept. Bei Lücken nacharbeiten und erneut prüfen. Kleine Korrekturen

@@ -17,12 +17,12 @@ SERVICES = ("postgres", "keycloak", "observability")
 CORE_FILES = (
     "AGENTS.md", ".github/copilot-instructions.md", ".gitignore", ".gitattributes", ".editorconfig", ".dockerignore", ".env.example",
     ".devcontainer/Dockerfile", "config/repositories.yaml",
-    "scripts/check.py", "scripts/status.py", "scripts/container_init.py", "scripts/init_speckit.py",
+    "scripts/check.py", "scripts/check_analyze_gate.py", "scripts/status.py", "scripts/container_init.py", "scripts/init_speckit.py",
     "scripts/prepare_contribution.py", "scripts/requirements.txt",
     "docs/decisions/README.md",
 )
 CORE_TREES = (
-    ".vscode", ".github/ISSUE_TEMPLATE", ".specify/memory",
+    ".vscode", ".github/ISSUE_TEMPLATE", ".github/agents", ".specify/memory",
     ".specify/templates/overrides", ".specify/workflows/project-sdd",
 )
 

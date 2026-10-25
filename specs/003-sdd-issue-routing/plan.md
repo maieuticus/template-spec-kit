@@ -10,8 +10,12 @@
   an, statt die allgemeine Anweisung zu überschreiben.
 - Das Basis-DV-Konzept erklärt die Regeln für Folgeprojekte; das
   Template-DV-Konzept verweist auf Feature 003 und pflegt den Arbeitsstand.
+- Das fehlende Spec-Kit-Profil für `converge` wird unter `.github/agents/`
+  ergänzt; der Generator übernimmt die Schrittprofile als Kernbaum in jedes
+  erzeugte Projekt.
 - Generator-Tests prüfen die gemeinsame Anweisung für Standardprojekte und
-  zusätzlich den erhaltenen API-Kontext für API-Projekte.
+  zusätzlich den erhaltenen API-Kontext für API-Projekte sowie das Vorhandensein
+  des Converge-Profils.
 
 ## Prüfung
 
