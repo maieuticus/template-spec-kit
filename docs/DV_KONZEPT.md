@@ -31,11 +31,14 @@ werden nicht gepflegt.
 - **Erledigt:** Drei Review-Korrekturen: Post-Create-Aufruf über Bash,
   zeilengebundene Pflichtfelder und vollständige Befundstrukturprüfung;
   [Aufgaben T013/T014](../specs/004-analyze-gate/tasks.md).
+- **Erledigt:** Die README korrigiert die bisher falsche automatische
+  Copilot-Installation und nennt den offiziellen Installer
+  `curl -fsSL https://gh.io/copilot-install | bash` mit PATH-Nacharbeit.
 - **Laufend:** Keine weitere Implementierung. Die gemeinsamen Prüfungen
-  bestehen mit 19 erfolgreichen Tests und einem unter Windows übersprungenen
-  POSIX-Test; der tatsächliche Containerstart bleibt ungeprüft. Das lesende
-  Nachreview der drei Korrekturen ergab keine neuen Befunde. Commit und Push
-  nach `origin/main` wurden vom Nutzer beauftragt.
+  bestehen aktuell unter Linux mit 20 erfolgreichen Tests; der tatsächliche
+  Containerstart bleibt ungeprüft. Das lesende Nachreview der drei Korrekturen
+  ergab keine neuen Befunde. Commit und Push nach `origin/main` wurden vom
+  Nutzer beauftragt.
 - **Priorisierter nächster Schritt:** Die POSIX-Regression unter Linux im
   Codespace mit dem veröffentlichten Änderungsstand ausführen.
 - **Blockaden:** Neue Sandbox-Prozesse scheitern weiterhin mit
@@ -428,54 +431,26 @@ auf dem eigenen Rechner stehen im Codespace nicht automatisch bereit.
 #### Copilot CLI im Codespace
 
 Voraussetzung ist ein GitHub-Konto mit Copilot-Zugang; bei einem
-Organisationskonto muss Copilot CLI freigegeben sein. Für die npm-Installation
-ist Node.js ab Version 22 erforderlich. Zuerst im **Bash-Terminal des Codespaces**
-prüfen:
+Organisationskonto muss Copilot CLI freigegeben sein. Die CLI wird nicht
+automatisch mit dem Codespace installiert. Zuerst im **Bash-Terminal des
+Codespaces** prüfen:
 
 ```bash
-node --version
-npm --version
 copilot --version
 ```
 
-Fehlt nur Copilot, genügt der npm-Installationsblock unten. Fehlt Node.js/npm
-oder ist Node älter als 22, zunächst nvm prüfen:
+Fehlt `copilot`, den offiziellen Installer ausführen:
 
 ```bash
-source ~/.bashrc
-command -v nvm
+curl -fsSL https://gh.io/copilot-install | bash
 ```
 
-Nur wenn nvm noch fehlt, den festgelegten Installer ausführen und in der
-aktuellen Shell laden:
+Der Installer installiert die CLI selbstständig. Falls er meldet, dass
+`~/.local/bin` nicht im `PATH` liegt, die ausgegebene `export PATH=...`-Zeile
+in die genannte Shell-Konfiguration aufnehmen und ein neues Terminal öffnen.
+Anschließend prüfen und starten:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-source ~/.bashrc
-```
-
-Falls nvm danach noch nicht gefunden wird, ein neues Bash-Terminal öffnen oder
-die vom Installer ausgegebene Ladeanweisung ausführen. Anschließend Node 22
-bereitstellen:
-
-```bash
-nvm install 22
-nvm alias default 22
-nvm use 22
-
-node --version
-npm --version
-```
-
-Bei einem Projekt mit festgelegter, kompatibler Node-Version diese beibehalten;
-der Block setzt andernfalls Node 22 als Standard für neue Terminals.
-Globale npm-Pakete müssen beim Wechsel der nvm-Node-Version gegebenenfalls
-für die gewählte Version erneut installiert werden.
-
-Copilot installieren, wenn es in der aktiven Umgebung fehlt:
-
-```bash
-npm install -g @github/copilot
 copilot --version
 copilot
 ```
@@ -486,9 +461,8 @@ funktionierenden Copilot-Anmeldung. Als Funktionstest um eine Erklärung der
 README bitten. Eine Versionsausgabe allein prüft den Kontozugang noch nicht.
 Copilot CLI und der Copilot-Chat im Editor sind getrennte Oberflächen.
 
-Die npm-Installation verwendet die zum Installationszeitpunkt veröffentlichte
-Version. `copilot --version` beim Einrichten festhalten; für einen im Projekt
-festgelegten Stand gezielt `npm install -g @github/copilot@VERSION` verwenden.
+Die Installation verwendet die zum Installationszeitpunkt veröffentlichte
+Version. `copilot --version` beim Einrichten festhalten.
 
 #### Codex in VS Code
 

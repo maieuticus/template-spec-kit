@@ -21,10 +21,19 @@ Initialisierung einer bereits versionierten Integration.
   beispielsweise `$speckit-specify` mit dem Feature-Auftrag senden.
 - **GitHub Codespaces mit Copilot:** Die [Codespace-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace)
   und die [Agent-Integration](docs/DV_KONZEPT.md#agent-integration-und-chat-aufrufe)
-  durchführen; im Bash-Terminal einmalig `python scripts/init_speckit.py --integration copilot`
-  ausführen. Danach im Copilot-Chat `/speckit-specify` verwenden. In VS Code
-  können die mitgelieferten `speckit-*`-Profile auch über die Agentenauswahl
-  im Copilot-Chat gewählt werden.
+  durchführen. Die Copilot CLI wird nicht automatisch installiert; im
+  Bash-Terminal einmalig ausführen:
+
+  ```sh
+  curl -fsSL https://gh.io/copilot-install | bash
+  ```
+
+  Falls `copilot` danach nicht gefunden wird, das vom Installer ausgegebene
+  `export PATH=...` in die Shell-Konfiguration übernehmen und ein neues Terminal
+  öffnen. Danach `python scripts/init_speckit.py --integration copilot`
+  ausführen und im Copilot-Chat `/speckit-specify` verwenden. In VS Code können
+  die mitgelieferten `speckit-*`-Profile auch über die Agentenauswahl im
+  Copilot-Chat gewählt werden.
 
 Mit `specify integration list` den vorhandenen Zustand zuerst prüfen. Für eine
 zusätzliche Integration die [Integrationsverwaltung](docs/DV_KONZEPT.md#bestehende-integrationen)
@@ -179,9 +188,10 @@ und ruft intern `specify init --here --integration codex --script sh --force`
 auf. Verwende es für die Arbeit im Linux-Container. Für native PowerShell gilt
 der obige Block mit `--script ps`. Wähle einen der beiden Wege.
 
-**GitHub Codespaces:** Die GitHub Copilot CLI wird beim Erstellen automatisch
-installiert. Starte sie mit `copilot`; die erstmalige Anmeldung führst du
-selbst über `/login` aus.
+**GitHub Codespaces:** Die GitHub Copilot CLI wird nicht automatisch
+installiert. Folge der [Codespace-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace);
+starte sie danach mit `copilot` und melde dich beim ersten Start über `/login`
+an.
 
 Nach erfolgreicher Initialisierung im Projekt-Terminal prüfen:
 
