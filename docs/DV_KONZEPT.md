@@ -34,8 +34,11 @@ werden nicht gepflegt.
 - **Erledigt:** Die README korrigiert die bisher falsche automatische
   Copilot-Installation und nennt den offiziellen Installer
   `curl -fsSL https://gh.io/copilot-install | bash` mit PATH-Nacharbeit.
+- **Erledigt:** Converge-Restaufgabe T015 umgesetzt: Der Analyze-Gate-Validator
+  weist unbekannte und doppelte Befundfelder nun fail-closed zurück; eine neue
+  Regression sichert unbekannte Felder und doppelte `Geändertes Artefakt`-Zeilen.
 - **Laufend:** Keine weitere Implementierung. Die gemeinsamen Prüfungen
-  bestehen aktuell unter Linux mit 20 erfolgreichen Tests; der tatsächliche
+  bestehen aktuell unter Linux mit 21 erfolgreichen Tests; der tatsächliche
   Containerstart bleibt ungeprüft. Das lesende Nachreview der drei Korrekturen
   ergab keine neuen Befunde. Commit und Push nach `origin/main` wurden vom
   Nutzer beauftragt.

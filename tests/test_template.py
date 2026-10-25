@@ -309,6 +309,31 @@ class ProjectGenerationTests(unittest.TestCase):
             self.assertTrue(any("genau ein Statusfeld ist erforderlich" in error for error in errors))
             self.assertTrue(any("Status offen, geklärt oder akzeptiert dokumentieren" in error for error in errors))
 
+    def test_analyze_report_validator_rejects_unknown_and_duplicate_fields(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            feature_dir = root / "specs/004-example"
+            feature_dir.mkdir(parents=True)
+            (root / ".specify").mkdir()
+            (root / ".specify/feature.json").write_text(
+                json.dumps({"feature_directory": "specs/004-example"}),
+                encoding="utf-8",
+            )
+            (feature_dir / "analyze.md").write_text(
+                "# Analyse\n\n## Wesentliche Befunde\n\n"
+                "### A001 — P1: Unerwartete Felder\n"
+                "- **Status:** akzeptiert\n"
+                "- **Begründung:** Entscheidung dokumentiert.\n"
+                "- **Zusatzfeld:** darf nicht vorkommen.\n"
+                "- **Geändertes Artefakt:** plan.md\n"
+                "- **Geändertes Artefakt:** tasks.md\n",
+                encoding="utf-8",
+            )
+            checked_path, errors = validate_report(root)
+            self.assertIsNotNone(checked_path)
+            self.assertTrue(any("unbekanntes Feld" in error for error in errors), errors)
+            self.assertTrue(any("darf nur einmal vorkommen" in error for error in errors), errors)
+
     def test_analyze_report_validator_rejects_empty_fields_before_other_fields(self):
         reports = (
             "- **Status:** geklärt\n- **Begründung:**\n- **Geändertes Artefakt:** spec.md\n",

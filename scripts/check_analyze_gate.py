@@ -8,13 +8,10 @@ from pathlib import Path
 FENCED_BLOCK = re.compile(r"(?ms)^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$")
 FINDING_HEADING = re.compile(r"^### (A\d+)\s+[—-]\s+.+$", re.MULTILINE)
 ANY_FINDING_HEADING = re.compile(r"^[ \t]*#{3,}[ \t]+[^\r\n]*$", re.MULTILINE)
-
-
-def _field(block: str, name: str) -> list[str]:
-    return re.findall(
-        rf"(?m)^[ \t]*(?:[-*][ \t]*)?\*\*{re.escape(name)}:\*\*[ \t]*([^\r\n]*?)[ \t]*\r?$",
-        block,
-    )
+FIELD_LINE = re.compile(
+    r"(?m)^[ \t]*(?:[-*][ \t]*)?\*\*([^:\r\n]+):\*\*[ \t]*([^\r\n]*?)[ \t]*\r?$"
+)
+ALLOWED_FIELDS = {"Status", "Begründung", "Geändertes Artefakt"}
 
 
 def validate_report(root: Path) -> tuple[Path | None, list[str]]:
@@ -101,10 +98,24 @@ def validate_report(root: Path) -> tuple[Path | None, list[str]]:
             continue
         block_end = headings[index + 1].start() if index + 1 < len(headings) else len(section)
         block = section[heading.end():block_end]
+        field_values = {field_name: [] for field_name in ALLOWED_FIELDS}
+        for field_name, field_value in FIELD_LINE.findall(block):
+            normalized_field = field_name.strip()
+            if normalized_field not in ALLOWED_FIELDS:
+                errors.append(
+                    f"{finding_id}: unbekanntes Feld {normalized_field!r}; "
+                    "erlaubt sind nur Status, Begründung und Geändertes Artefakt."
+                )
+                continue
+            field_values[normalized_field].append(field_value)
 
-        status_values = _field(block, "Status")
-        reason_values = _field(block, "Begründung")
-        artifact_values = _field(block, "Geändertes Artefakt")
+        for field_name, values in field_values.items():
+            if len(values) > 1:
+                errors.append(f"{finding_id}: Feld {field_name!r} darf nur einmal vorkommen.")
+
+        status_values = field_values["Status"]
+        reason_values = field_values["Begründung"]
+        artifact_values = field_values["Geändertes Artefakt"]
         if len(status_values) != 1:
             errors.append(
                 f"{finding_id}: genau ein Statusfeld ist erforderlich; "

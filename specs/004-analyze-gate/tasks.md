@@ -61,3 +61,10 @@
 
 Der tatsächliche Stand und die nächsten Schritte stehen im
 [DV-Konzept](../../docs/DV_KONZEPT.md#aktueller-arbeitsstand).
+
+## Phase 1: Convergence
+
+- [x] T015 Unbekannte und doppelte Befundfelder in
+  `scripts/check_analyze_gate.py` fail-closed zurückweisen und Regressionen
+  ergänzen, einschließlich doppelter optionaler Artefaktfelder bei
+  akzeptierten Befunden, per Plan: Berichtformat (partial)
