@@ -35,6 +35,9 @@ class ProjectGenerationTests(unittest.TestCase):
                 self.assertFalse((root / ".env").exists())
                 self.assertFalse((root / ".specify/integration.json").exists())
                 self.assertFalse(any(root.rglob("*sport_app*")))
+                instructions = (root / ".github/copilot-instructions.md").read_text()
+                self.assertIn("Nenne in jeder inhaltlichen Antwort", instructions)
+                self.assertIn("maieuticus/template-spec-kit", instructions)
                 if stack == "java-maven":
                     self.assertTrue((root / "src/test/java/example/AppTest.java").is_file())
                     self.assertFalse((root / "tests").exists())
@@ -68,6 +71,9 @@ class ProjectGenerationTests(unittest.TestCase):
         self.assertIn("tests/test_openapi_contract.py", files)
         self.assertIn("RUN_DATABASE_TESTS=1", files[".github/workflows/ci.yml"].decode())
         self.assertNotIn("POSTGRES_PASSWORD:", files[".github/workflows/ci.yml"].decode())
+        instructions = files[".github/copilot-instructions.md"].decode()
+        self.assertIn("Nenne in jeder inhaltlichen Antwort", instructions)
+        self.assertIn("API-Projektkontext", instructions)
 
     def test_rejects_populated_destination_without_touching_it(self):
         with TemporaryDirectory() as directory:

@@ -12,8 +12,8 @@ werden nicht gepflegt.
 
 **Stand:** 2026-10-25
 
-**Aktives Feature:** Kein neues Feature; Codespaces-Integration der GitHub
-Copilot CLI ergänzt.
+**Aktives Feature:** Kein neues Feature; Feature 003 – Schrittführung,
+Modellempfehlung und Template-Issue-Routing abgeschlossen.
 
 ### Zuletzt erledigt
 
@@ -27,11 +27,15 @@ Copilot CLI ergänzt.
 - GitHub Copilot CLI als idempotentes Devcontainer-Post-Create-Skript
   eingerichtet, in GitHub Codespaces eingebunden und die VS-Code-Erweiterung
   ergänzt; [Devcontainer-Konfiguration](../.devcontainer/devcontainer.json).
+- Allgemeine Agenten- und Copilot-Anweisungen mit Schrittführung,
+  Modell-/Reasoning-Empfehlungen und Template-Issue-Routing ergänzt; die
+  Anweisung wird auch in Standard- und API-Projekte übernommen.
+  [Aufgaben von Feature 003](../specs/003-sdd-issue-routing/tasks.md).
 
 ### Aktuell in Arbeit
 
-- Keine laufende Umsetzung. Die manuelle Startprüfung aus Feature 002 und die
-  erste Ausführung des neuen Codespaces-Post-Create-Skripts bleiben offen.
+- Keine laufende Umsetzung. Die manuellen Prüfungen aus Feature 002 und der
+  Codespaces-Integration bleiben offen.
 
 ### Nächste Schritte
 
@@ -48,6 +52,9 @@ Copilot CLI ergänzt.
   Ergänzung der Codespaces-Integration erfolgreich; auch erzeugte Projekte geprüft.
 - `.devcontainer/devcontainer.json` mit `python -m json.tool` und
   `.devcontainer/post-create.sh` mit `bash -n` erfolgreich geprüft.
+- `python scripts/check.py`: Dokumentlinks, Dateisyntax und alle 14 Tests nach
+  Feature 003 erfolgreich; Standard- und API-Projekte mit den neuen
+  Copilot-Anweisungen erzeugt.
 - Spec-Kit-Befehle anhand der Referenz für 1.0.7 abgeglichen;
   Initialisierung und Agenten-Chat nicht erneut ausgeführt.
 - Keine Blockade; interaktive Startanzeige aus Feature 002 und tatsächlicher

@@ -269,6 +269,33 @@ werden Datum, aktives Feature, Erledigtes, laufende Arbeit, priorisierte nächst
 Schritte, Blockaden und tatsächlich ausgeführte Prüfungen hier aktualisiert.
 Details bleiben in den verlinkten Feature-Aufgaben und Prüfergebnissen.
 
+### Schrittführung, Modellempfehlung und Template-Verbesserungen
+
+Jede inhaltliche Agentenantwort und jeder Spec-Kit-Schritt nennt genau einen
+nächsten konkreten Schritt. Dafür wird ein in der aktiven Umgebung auswählbares
+Modellprofil mit Reasoning-Stufe empfohlen: `clarify` und `checklist` verwenden
+ein schnelles allgemeines Modell mit niedriger Stufe; `specify` und `tasks` ein
+Coding-Modell mit mittlerer Stufe; `plan`, `analyze` und `converge` ein
+reasoning-starkes Coding-Modell mit hoher Stufe; `implement` ein Coding-Modell
+mit mittlerer Stufe, bei Architektur-, Sicherheits- oder Migrationsänderungen
+mit hoher Stufe. Ist keine Modellauswahl verfügbar, wird das
+Plattform-Standardmodell mit der empfohlenen Stufe benannt.
+
+Fachliche Ziele, Prioritäten, Domänenbegriffe und Produktentscheidungen bleiben
+in diesem Projekt, seinem DV-Konzept und seinen Feature-Artefakten. Nur
+wiederverwendbare Prozess-, Tooling- oder Template-Erkenntnisse werden als
+Verbesserungskandidaten behandelt. Dafür formuliert der Agent einen
+Issue-Vorschlag mit Titel, Nutzen und überprüfbaren Akzeptanzkriterien. Das
+kanonische Template-Repository ist
+https://github.com/maieuticus/template-spec-kit; Template-Verbesserungen werden
+dort als Issues angelegt, nicht im Produktprojekt. Ein Issue wird nur auf
+ausdrücklichen Auftrag erstellt.
+
+Beispiel: „Die gemeinsame Prüfung sollte fehlende Projektdateien klar
+benennen“ wird zum Vorschlag „Prüfung: Fehlende Projektdateien eindeutig
+melden“ mit dem Nutzen „schnellere Fehlerdiagnose“ und Kriterien für fehlende,
+vorhandene und unlesbare Dateien.
+
 ### Feature-Ablauf
 
 Rohmaterialien und Wissen sichten, Feature spezifizieren, Unklarheiten klären,

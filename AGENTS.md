@@ -31,3 +31,31 @@
   projektspezifische Beschreibungen bleiben im Projekt.
 - Vorhandene Benutzeränderungen erhalten. Keine automatischen Aktualisierungen
   oder unkontrollierten Überschreibungen von Projektdateien.
+
+## Schrittführung, Modellempfehlung und Template-Verbesserungen
+
+- Jede inhaltliche Antwort und jeder ausgeführte Spec-Kit-Schritt nennt genau
+  einen nächsten konkreten Schritt. Erst nach dessen Ergebnis wird der folgende
+  Schritt bestimmt.
+- Nenne je Schritt ein in der aktiven Agent-Umgebung auswählbares
+  Modellprofil und die Reasoning-Stufe: `clarify` und `checklist` nutzen ein
+  schnelles allgemeines Modell mit niedriger Stufe; `specify` und `tasks` ein
+  Coding-Modell mit mittlerer Stufe; `plan`, `analyze` und `converge` ein
+  reasoning-starkes Coding-Modell mit hoher Stufe; `implement` ein
+  Coding-Modell mit mittlerer Stufe, bei Architektur-, Sicherheits- oder
+  Migrationsänderungen mit hoher Stufe. Wenn keine Modellauswahl verfügbar
+  ist, benenne das Plattform-Standardmodell und die empfohlene Stufe.
+- Fachliche Ziele, Prioritäten, Domänenbegriffe und Produktentscheidungen
+  gehören ausschließlich in das jeweilige Projekt, sein DV-Konzept und seine
+  Feature-Artefakte. Sie sind keine Template-Verbesserungen.
+- Erkennbare wiederverwendbare Prozess-, Tooling- oder Template-Verbesserungen
+  als Issue-Vorschlag mit Titel, Nutzen und überprüfbaren Akzeptanzkriterien
+  formulieren. Das kanonische Ziel ist
+  https://github.com/maieuticus/template-spec-kit; solche Verbesserungen
+  werden dort als Issues angelegt, nicht im Produktprojekt. Keine Issues ohne
+  ausdrücklichen Auftrag erstellen.
+- Beispiel: „Der Generator sollte die konfigurierten Prüfungen vor dem
+  Schreiben des Zielordners validieren“ wird zum Issue-Vorschlag
+  „Generator: Prüfkonfiguration vor dem Schreiben validieren“ mit Nutzen
+  „Fehler ohne Teilzustand melden“ und Kriterien für ungültige, gültige und
+  unveränderte Zielordner.

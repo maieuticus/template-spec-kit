@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STACKS = ("none", "python", "typescript", "java-maven")
 SERVICES = ("postgres", "keycloak", "observability")
 CORE_FILES = (
-    "AGENTS.md", ".gitignore", ".gitattributes", ".editorconfig", ".dockerignore", ".env.example",
+    "AGENTS.md", ".github/copilot-instructions.md", ".gitignore", ".gitattributes", ".editorconfig", ".dockerignore", ".env.example",
     ".devcontainer/Dockerfile", "config/repositories.yaml",
     "scripts/check.py", "scripts/status.py", "scripts/container_init.py", "scripts/init_speckit.py",
     "scripts/prepare_contribution.py", "scripts/requirements.txt",
@@ -109,7 +109,14 @@ def render_files(name: str, stack: str, services: list[str], recipe: str | None 
     if recipe:
         module = ROOT / "templates/recipes/api-service"
         meta = load_yaml(module / "module.yaml")
+        common_copilot_instructions = files[".github/copilot-instructions.md"]
         add_tree(files, module / "files")
+        api_copilot_instructions = (
+            module / ".github/copilot-instructions.md.template"
+        ).read_bytes()
+        files[".github/copilot-instructions.md"] = (
+            common_copilot_instructions + b"\n\n" + api_copilot_instructions
+        )
         config["checks"] = meta["checks"]
         setup = meta["setup"]
         container.setdefault("forwardPorts", []).append(8000)
