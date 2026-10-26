@@ -29,7 +29,12 @@ wird einmal je Projekt eingerichtet; Anleitung und Prüfung stehen unter
   mitgelieferten `speckit-*`-Profile auch über die Agentenauswahl im Copilot-Chat
   gewählt werden.
 
-Zuerst `specify integration list` prüfen. Bei bereits eingerichteter Integration
+Lokal zuerst `python scripts/bootstrap_specify.py` ausführen; Codespaces erledigt
+dies automatisch. Windows: `.\scripts\specify.ps1 version --features --json`,
+Linux: `./scripts/specify version --features --json`. Die Version steht in
+`.specify-version`; [Nutzung, Diagnose und Updates](docs/DV_KONZEPT.md#portable-specify-laufzeit).
+
+Zuerst über diesen Wrapper `integration list` prüfen. Bei bereits eingerichteter Integration
 die versionierten Dateien weiterverwenden; ein neuer Codespace erfordert keine
 erneute Initialisierung. Zusätzliche Integrationen gemäß Anleitung installieren.
 

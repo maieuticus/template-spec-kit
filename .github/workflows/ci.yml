@@ -15,6 +15,7 @@ jobs:
           python-version: "3.13"
       - run: python -m pip install -r scripts/requirements.txt
       - run: python scripts/check.py
+      - run: python tests/smoke_specify.py
   projects:
     runs-on: ubuntu-latest
     strategy:
@@ -59,12 +60,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - run: python -m pip install -r scripts/requirements.txt specify-cli==1.0.7
+      - run: python -m pip install -r scripts/requirements.txt
       - run: python scripts/create_project.py --name smoke-integration --recipe api-service --service keycloak --service observability --output .artifacts/integration
+      - working-directory: .artifacts/integration
+        run: python scripts/bootstrap_specify.py
       - working-directory: .artifacts/integration
         run: python scripts/init_speckit.py --integration copilot
       - working-directory: .artifacts/integration
-        run: specify workflow validate .specify/workflows/project-sdd/workflow.yml
+        run: ./scripts/specify workflow info .specify/workflows/project-sdd/workflow.yml
       - working-directory: .artifacts/integration
         run: python scripts/container_init.py
       - working-directory: .artifacts/integration

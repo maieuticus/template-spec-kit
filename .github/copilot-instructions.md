@@ -3,6 +3,13 @@
 Lies `AGENTS.md`, `.specify/memory/constitution.md` und
 `docs/DV_KONZEPT.md`, bevor du Änderungen planst oder umsetzt.
 
+- Prüfe bei Sitzungsbeginn und vor der Weiterarbeit den aktuellen Arbeitsstand
+  im DV-Konzept auf vom Nutzer priorisierte offene Entscheidungen. Bringe dann
+  zuerst die erste offene Entscheidung vor und besprich Nutzen, Risiken,
+  Maßnahmen und Empfehlung einzeln. Dokumentiere die Antwort, bevor du den
+  nächsten Punkt bestimmst. Empfehlungen oder frühere allgemeine
+  Fortsetzungsaufträge sind keine Entscheidung; abhängige Aktionen warten
+  auf die jeweilige Nutzerentscheidung.
 - Nenne in jeder inhaltlichen Antwort und nach jedem Spec-Kit-Schritt genau
   einen nächsten konkreten Schritt.
 - Stelle den nächsten Schritt als genau eine kompakte, statusmarkierte Karte
@@ -46,3 +53,13 @@ Lies `AGENTS.md`, `.specify/memory/constitution.md` und
   benennen“ wird zum Vorschlag „Prüfung: Fehlende Projektdateien eindeutig
   melden“ mit dem Nutzen „schnellere Fehlerdiagnose“ und Kriterien für
   fehlende, vorhandene und unlesbare Dateien.
+
+## Portable Specify-Schnittstelle
+
+- Specify ausschließlich über den Repository-Wrapper ausführen: Windows
+  `.\scripts\specify.ps1 <Argumente>`, Linux/Codespaces
+  `./scripts/specify <Argumente>`. Unter Windows niemals `specify.exe` verwenden.
+- Vor der ersten lokalen Nutzung `python scripts/bootstrap_specify.py` ausführen;
+  im Devcontainer erfolgt dies automatisch. Die Version steht in `.specify-version`.
+- Wrapper und Setup sind die unterstützte portable Schnittstelle. Keine persönlichen
+  Profile, PATH-Anpassungen oder Änderungen an Windows-Sicherheitsrichtlinien nötig.

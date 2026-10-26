@@ -6,6 +6,13 @@
   Arbeitsstand“ im DV-Konzept mit Git und den relevanten Feature-Aufgaben ab.
   Zeige in der ersten inhaltlichen Antwort kurz zuletzt Erledigtes, laufende
   Arbeit, nächste Schritte und Blockaden; benenne veraltete oder unklare Angaben.
+- Haben vom Nutzer priorisierte offene Entscheidungen im aktuellen Arbeitsstand
+  Vorrang, bringe bei Sitzungsbeginn und vor der Weiterarbeit zuerst die erste
+  offene Entscheidung vor. Besprich Nutzen, Risiken, Maßnahmen und Empfehlung;
+  behandle genau einen Punkt je Antwort. Halte die Nutzerentscheidung im
+  DV-Konzept fest, bevor du den folgenden Punkt bestimmst. Empfehlungen und
+  frühere allgemeine Fortsetzungsaufträge ersetzen keine offene Entscheidung.
+  Führe davon abhängige Aktionen erst nach der jeweiligen Entscheidung aus.
 - Pflege bei beauftragten Änderungen den Arbeitsstand nach wesentlichen
   Schritten und vor einer Übergabe: Standdatum, aktives Feature, Erledigtes,
   laufende Arbeit, priorisierte nächste Schritte und tatsächliche Prüfungen.
@@ -82,3 +89,13 @@
   „Generator: Prüfkonfiguration vor dem Schreiben validieren“ mit Nutzen
   „Fehler ohne Teilzustand melden“ und Kriterien für ungültige, gültige und
   unveränderte Zielordner.
+
+## Portable Specify-Schnittstelle
+
+- Specify ausschließlich über den Repository-Wrapper ausführen: Windows
+  `.\scripts\specify.ps1 <Argumente>`, Linux/Codespaces
+  `./scripts/specify <Argumente>`. Unter Windows niemals `specify.exe` verwenden.
+- Vor der ersten lokalen Nutzung `python scripts/bootstrap_specify.py` ausführen;
+  im Devcontainer erfolgt dies automatisch. Die Version steht in `.specify-version`.
+- Wrapper und Setup sind die unterstützte portable Schnittstelle. Keine persönlichen
+  Profile, PATH-Anpassungen oder Änderungen an Windows-Sicherheitsrichtlinien nötig.

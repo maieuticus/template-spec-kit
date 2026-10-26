@@ -1,6 +1,6 @@
 # DV-Konzept: template-spec-kit
 
-**Stand:** 25.10.2026
+**Stand:** 26.10.2026
 **Status:** Projektgrundgerüst mit optionalen Technologie- und Dienstbausteinen
 
 Dieses Dokument ist die verbindliche Beschreibung von Projektziel, Architektur,
@@ -9,6 +9,76 @@ hierher. Getrennte Dateien für Vision, Architektur, Entwicklung oder Betrieb
 werden nicht gepflegt.
 
 ## Aktueller Arbeitsstand
+
+### Sitzung: Portable Specify-Laufzeit – 26.10.2026
+
+- **Stand:** 2026-10-26. **Aktives Feature:** [005](../specs/005-portable-specify/spec.md);
+  [maßgebliche Aufgaben](../specs/005-portable-specify/tasks.md).
+- **Erledigt:** Bestand einschließlich Generator, Devcontainer, CI, Agentenregeln,
+  Versionsmechanismen und Projektvorlagen abgeglichen. Zentrale CLI-Version,
+  universelle Dependency-Constraints, idempotenter Bootstrap mit lokalem
+  uv-Fallback und beide Wrapper implementiert. Generator, Init, Post-Create,
+  Agentenregeln und Dokumentation verwenden die gemeinsame Laufzeit.
+- **Erledigt:** Reale Installation und Version 1.0.7 unter Windows und WSL-Linux
+  nachgewiesen. Neutrale generierte Projekte mit Leerzeichen im Pfad geprüft:
+  wiederholtes Setup ohne Neuinstallation, CLI-Argumente, Fehler-Exit-Code und
+  explizite Reparatur erfolgreich. CI verwendet den echten plattformabhängigen
+  Wrapper-Smoke. Der alte CI-Aufruf `workflow validate` existiert in 1.0.7
+  nicht; durch den erfolgreich geprüften Aufruf `workflow info` ersetzt.
+- **Laufend:** Auf ausdrücklichen Nutzerwunsch zuerst die fünf offenen
+  Entscheidungen zum Codespace-Test einzeln abwägen und festhalten. Noch keine
+  dieser Entscheidungen getroffen. Änderungen weiterhin lokal, ohne Commit
+  oder Push; neutrales Testprojekt unter `.artifacts/codespace-smoke/project`
+  erzeugt und statisch geprüft. Kein Testrepository und kein Codespace angelegt.
+- **Priorisierter nächster Schritt:** Entscheidung 1 zum Zugriffsweg vorlegen:
+  Weboberfläche (Empfehlung), vorübergehender oder dauerhafter CLI-Scope.
+  Den Remote-Test erst gemäß den anschließend festgehaltenen Entscheidungen
+  durchführen; siehe [Entscheidungsstand](#priorisierte-offene-entscheidungen).
+- **Blockaden/Prüfgrenzen:** Die GitHub CLI ist angemeldet, die Codespaces-API
+  meldete jedoch HTTP 403 wegen fehlendem Scope `codespace`. Ein
+  Autorisierungsablauf wurde begonnen und vor einer bestätigten Freigabe
+  beendet. Keine weitere Autorisierung vor Entscheidung 1.
+  Kein Docker verfügbar; tatsächlicher Codespace-Start
+  und Smart-App-Control-Zustand hier nicht geprüft. Die lokale Execution Policy
+  sperrt `.ps1`-Starts; PowerShell-Parser und Argumenttransport geprüft, der
+  gemeinsame Python-Entrypoint funktioniert. Keine Sicherheitsrichtlinie geändert.
+  Die Sandbox-Störung wurde durch ausdrücklich freigegebenen Toolzugriff für
+  diese Arbeit überbrückt. [T006](../specs/002-projektstatus/tasks.md) bleibt
+  unabhängig offen. Die älteren Sitzungsangaben unten sind historisch.
+- **Erledigt:** Priorisierte Wiedervorlage im README, in den Agentenregeln und
+  in diesem Entscheidungsstand verankert; die fünf konkreten Entscheidungen
+  bleiben ausschließlich in diesem Repository. Aufgaben T007–T009 ergänzt.
+- **Prüfung der Wiedervorlage:** `python scripts/check.py` unter Windows erneut
+  erfolgreich: 30 Tests erfasst, 28 erfolgreich und zwei POSIX-Prüfungen
+  übersprungen. Dokumentlinks und Syntax sowie `git diff --check` erfolgreich;
+  Linux- und Remote-Läufe für diese Dokumentationsänderung nicht wiederholt.
+- **Prüfungen:** Windows: 30 Tests, 28 erfolgreich und zwei reine POSIX-Prüfungen
+  übersprungen. Linux: alle 30 Tests erfolgreich einschließlich Shell-Syntax und
+  Post-Create-Regression; Details im [Prüfstatus](#portable-specify-laufzeit--26102026).
+
+### Priorisierte offene Entscheidungen
+
+**Stand:** 2026-10-26. **Nutzerauftrag:** Beim Start und bei der Weiterbearbeitung
+in diesem Repository diese Entscheidungen zuerst vorbringen und gemeinsam
+Schritt für Schritt behandeln. Gegenwärtig ist nur Entscheidung 1 an der Reihe.
+Eine Empfehlung ist kein Beschluss. Die frühere allgemeine Aufforderung zur
+Fortsetzung nimmt keine der folgenden Entscheidungen vorweg.
+
+| Nr. | Entscheidung | Kritikalität und sinnvolle Maßnahmen | Empfehlung / Status |
+| --- | --- | --- | --- |
+| 1 | Zugriffsweg: Weboberfläche, vorübergehender oder dauerhafter CLI-Scope `codespace`? | Mittel, mögliche Auswirkungen hoch: der Scope gilt für die Verwaltung der eigenen Codespaces insgesamt. Webstart braucht keine Erweiterung der lokalen CLI-Anmeldung. Bei temporärem Scope vorherige Scopes festhalten und anschließende Entfernung prüfen. | Weboberfläche für den einmaligen Nachweis empfohlen; **offen, zuerst behandeln**. |
+| 2 | Welche Installationsschritte dürfen ausgeführt werden und wie wird der Test vor Zugriffen auf Secrets geschützt? | Mittel: Dockerfile, Features und Post-Create laden und starten Code. Konkrete Installationsquellen und konfigurierten Secret-/Berechtigungszugriff vor Start prüfen; Testprojekt ohne benötigte echte Secrets verwenden. | Schutzmaßnahmen gemeinsam festlegen; **offen**. |
+| 3 | Dürfen welche Dateien in ein separates privates Testrepository übertragen werden? | Niedrig bis mittel: ausschließlich generierte Projektdateien nach Inhaltskontrolle übernehmen; keine `.env`, lokalen Artefakte oder Zugangsdaten hochladen; Sichtbarkeit privat prüfen. | Separates privates Testrepository vorgeschlagen, noch nicht angelegt; **offen**. |
+| 4 | Welcher Ressourcenrahmen gilt und wie werden Testressourcen aufgeräumt? | Niedrig bei kurzem Lauf: kleine geeignete Maschine, begrenzte Laufzeit und Kontingent/Budget vorher prüfen. Stoppen beendet nicht den Speicherverbrauch; gezieltes Löschen der ausschließlich für diesen Test erzeugten Ressourcen vereinbaren. | Konkrete Grenzen und Aufräumumfang gemeinsam festlegen; **offen**. |
+| 5 | Wie werden bestehende Arbeit und Codespaces vor versehentlichen Änderungen geschützt? | Niedrig bei Isolation: Testressourcen eindeutig erfassen, separate Umgebung nutzen und vor jeder Bereinigung Zielidentität prüfen. | Bestehende Ressourcen erhalten und Testressourcen getrennt behandeln; **offen**. |
+
+Bei jeder Entscheidung Optionen, Nutzen, Risiken und Maßnahmen kurz gegeneinander
+abwägen, genau eine Entscheidungskarte vorlegen und die ausdrückliche Antwort hier
+eintragen. Erst danach die nächste offene Entscheidung bestimmen. Abhängige
+Autorisierungen, Uploads, Cloud-Ressourcen und Installationsläufe warten auf die
+jeweilige Klärung. Die Dokumentation dieser Reihenfolge ist bereits beauftragt.
+Die konkreten Entscheidungen bleiben in diesem DV-Konzept und werden nicht in
+generierte Anwendungsprojekte übernommen.
 
 ### Sitzung: Spec-Kit-Aktivierung – 25.10.2026
 
@@ -275,7 +345,7 @@ Ein Monorepo kann stattdessen `apps/` und `packages/` verwenden.
 
 Der Container startet über `.devcontainer/compose.yaml`. Das Python-Basisimage
 stellt die gemeinsamen Werkzeuge bereit; Features ergänzen Node oder Java nur
-im gewählten Profil. Die Specify CLI ist auf 1.0.7 festgelegt.
+im gewählten Profil. Die Specify CLI wird gemäß `.specify-version` im Post-Create eingerichtet.
 
 PostgreSQL, Keycloak, Prometheus und Grafana laufen bei Auswahl als separate
 Container. Die ausgewählten Services stehen ausdrücklich in `runServices`.
@@ -318,7 +388,7 @@ müssen in der tatsächlich verwendeten Umgebung installiert sein.
 | Terminalbefehl | Aussage und Zweck |
 | --- | --- |
 | `git status` | Branch sowie vorgemerkte, nicht vorgemerkte und unversionierte Änderungen ansehen. |
-| `specify version` | Installierte CLI-Version und Laufzeitumgebung anzeigen; mit `speckit_version` in `config/project.yaml` vergleichen. |
+| `specify version` | Installierte CLI-Version und Laufzeitumgebung anzeigen; mit `.specify-version` vergleichen. |
 | `specify check` | Verfügbarkeit unterstützter Agent-CLI-Werkzeuge prüfen; IDE-Integrationen werden übersprungen. |
 | `specify integration list` | Verfügbare und installierte Integrationen sowie die Standardintegration ansehen. |
 | `specify integration status` | Im initialisierten Projekt verwaltete Integrationsdateien und gemeinsame Spec-Kit-Struktur diagnostizieren. |
@@ -332,8 +402,7 @@ Versionsausgabe bestätigt noch keine eingerichtete Integration.
 Die Unterscheidung folgt der [CLI-Referenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/core.md)
 und der [Integrationsreferenz für 1.0.7](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md).
 
-`uv` ist optional. Auch bei Installation über `uv tool install` die festgelegte
-Version wählen, etwa `uv tool install specify-cli==1.0.7`. Die Profilanleitung
+`uv` wird durch das Repository-Setup bereitgestellt. Die Profilanleitung
 bestimmt Installation und Tests der Anwendung. `uv sync` und `uv run pytest`
 sind hier keine profilübergreifenden Standardbefehle.
 
@@ -518,6 +587,87 @@ Offizielle Anleitungen (abgeglichen am 24.09.2026):
 [Codex-Erweiterung](https://developers.openai.com/codex/ide) und
 [Codex CLI](https://developers.openai.com/codex/cli).
 
+### Portable Specify-Laufzeit
+
+Die einzige CLI-Versionsquelle ist `.specify-version` (anfangs 1.0.7).
+Der vorhandene Devcontainer-/Codespaces-Post-Create-Schritt führt das Setup
+vor der Agent-Einrichtung automatisch aus. Lokal einmal im Repository ausführen:
+
+```sh
+python scripts/bootstrap_specify.py
+```
+
+Voraussetzung ist Python ab 3.11 mit pip ab 22.3 und venv. Vorhandenes `uv` wird verwendet;
+fehlt es, installiert das Setup den Pin aus `scripts/uv-requirements.txt` in eine
+ignorierte lokale Umgebung. Persönliche Profile und PATH-Anpassungen sind unnötig.
+Mehrfaches Setup prüft die Paketversion und erhält passende Installationen.
+
+**Windows PowerShell:**
+
+```powershell
+.\scripts\specify.ps1 version --features --json
+.\scripts\specify.ps1 integration list
+```
+
+**Linux / Codespaces:**
+
+```sh
+./scripts/specify version --features --json
+./scripts/specify integration list
+```
+
+In den folgenden allgemeinen CLI-Beispielen steht `specify` für diesen
+Repository-Wrapper; unter Windows immer die PowerShell-Variante verwenden.
+Die Wrapper bestimmen ihren Dateipfad relativ zum Skript; Specify selbst arbeitet
+im aktuellen Arbeitsverzeichnis. Argumente und Exit-Codes werden weitergereicht.
+
+Die Tool-Umgebungen liegen getrennt nach Plattform unter `.artifacts/specify/`.
+Das Setup setzt `UV_TOOL_DIR` und `UV_TOOL_BIN_DIR` nur für seine Kindprozesse;
+`uv tool dir` liefert den tatsächlichen Installationspfad. Dadurch beeinflussen
+sich verschiedene Repositories und Versionen nicht gegenseitig. Der Wrapper
+ruft dessen Python mit `from specify_cli import main; main()` auf. Der von uv
+erzeugte `specify.exe`-Launcher wird nie gestartet. Windows Smart App Control
+kann diesen unsignierten Launcher blockieren, obwohl das Paket selbst funktioniert.
+Sicherheitsrichtlinien, Registry und PowerShell-Profile werden nicht geändert.
+Auch der Python-Interpreter und lokale Skripte müssen nach den geltenden Regeln
+ausführbar sein; die Wrapper ändern keine Ausführungsrichtlinie. Falls PowerShell
+lokale Skripte sperrt, dieselbe Schnittstelle mit
+`python scripts/specify_tool.py version --features --json` verwenden.
+
+**Diagnose:** `python --version` und, falls vorhanden, `uv --version` prüfen.
+Bei fehlender/falscher Installation Setup erneut ausführen. Bei beschädigten
+Abhängigkeiten `python scripts/bootstrap_specify.py --repair` verwenden.
+Fehler bei Downloads, Zertifikaten oder Berechtigungen zuerst beheben; keine
+Sicherheitsfunktionen abschalten. Nicht die global installierte CLI reparieren:
+der Repository-Wrapper verwendet seine eigene Umgebung.
+
+Transitive Abhängigkeiten stehen plattformübergreifend in
+`scripts/specify-constraints.txt`. Ein Installationsfingerabdruck erkennt
+Änderungen am Pin oder an diesen Constraints; das Setup installiert dann neu.
+
+**Upgrade:** `.specify-version` ändern,
+`python scripts/bootstrap_specify.py --update-lock` ausführen (aktualisiert die
+transitiven Pins und installiert neu), beide Wrapper mit
+`version --features --json` sowie die Projektprüfungen testen und den geprüften
+Stand committen. Vorhandene Integrationen separat mit dem Wrapper und
+`integration upgrade <integration>` aktualisieren; Diff prüfen. Die Constraints fixieren Paketversionen, keine Download-Hashes oder
+Betriebssystem-/Python-Images; eine Offline-Installation wird nicht zugesichert.
+
+Neue Projekte übernehmen den neuen Stand. Bereits früher erzeugte Repositories
+werden nicht automatisch aktualisiert. Für eine manuelle Übernahme gehören
+`.specify-version`, `scripts/bootstrap_specify.py`, `scripts/specify_tool.py`,
+`scripts/specify`, `scripts/specify.ps1`, `scripts/uv-requirements.txt`,
+`scripts/specify-constraints.txt` und das
+angepasste `scripts/init_speckit.py` zusammen. Dazu die Änderungen an
+`.devcontainer/Dockerfile`, `.devcontainer/post-create.sh`, `.gitignore`
+(`.artifacts/`), Agentenregeln und dieser Anleitung gezielt zusammenführen;
+POSIX-Ausführungsbit für `scripts/specify` erhalten. Einen alten
+`speckit_version`-Eintrag in `config/project.yaml` entfernen. Generator und
+Template-Tests sind nur bei Pflege eines weiteren Templates nötig.
+
+Technische Grundlagen: [uv-Tool-Umgebungen](https://docs.astral.sh/uv/concepts/tools/)
+und [Spec-Kit-Paket-Entrypoint](https://github.com/github/spec-kit/blob/v1.0.7/pyproject.toml).
+
 ### Spec Kit initialisieren
 
 Die Initialisierung erfolgt im Root-Verzeichnis des erzeugten Projekts.
@@ -526,15 +676,15 @@ Ausgangsstand in Git sichern. Der Generator führt kein `git init` aus.
 Die vorhandene `.specify/memory/constitution.md` ist die mitgelieferte Grundlage;
 eine zweite Constitution-Vorlage wird nicht gepflegt.
 
-Im Container ist die festgelegte CLI installiert. Außerhalb kann `uvx` verwendet
-oder `python -m pip install specify-cli==1.0.7` ausgeführt werden.
+Zuerst die [portable Laufzeit](#portable-specify-laufzeit) einrichten; im
+Codespace erfolgt das automatisch.
 
 ```sh
 python scripts/init_speckit.py --integration codex
 ```
 
 Das Skript initialisiert die gewählte Integration, lässt die Constitution
-unverändert und verwendet die Bash-Skripte für die Arbeit im Linux-Container.
+unverändert und wählt unter Windows PowerShell-, unter Linux Bash-Skripte.
 Andere unterstützte Integrationen können über `--integration` ausgewählt werden.
 Die konkreten Agent-Dateien und Manifeste erzeugt Spec Kit.
 Für Copilot beispielsweise `--integration copilot` verwenden; ohne Angabe
@@ -548,8 +698,7 @@ erneut blind initialisieren.
 
 Mit `--integration` genau die gewünschte Integration wählen: `codex`,
 `copilot` oder beispielsweise `cursor-agent`. Im Container nutzt das Init-Skript
-Bash; für native PowerShell den unten beschriebenen Ablauf mit `--script ps`
-verwenden. Der Agent muss in dieser Umgebung nutzbar sein.
+Bash; unter Windows wählt es automatisch PowerShell. Der Agent muss in dieser Umgebung nutzbar sein.
 
 Die folgenden Beispiele gehören in den **Agenten-Chat**, nicht ins Terminal:
 
@@ -596,77 +745,24 @@ Execution Policy blockiert ist.
 
 #### Codex mit Windows PowerShell initialisieren
 
-Für die Arbeit direkt unter Windows werden PowerShell-Skripte benötigt.
-`scripts/init_speckit.py` unterstützt keinen `--script`-Parameter und wählt
-immer `sh`. Für ein noch nicht initialisiertes Projekt deshalb den folgenden
-Ablauf **im Root-Verzeichnis des erzeugten Projekts** verwenden. Git, Codex,
-die Projektabhängigkeiten und `specify-cli==1.0.7` müssen installiert sein.
-
-Zuerst Arbeitsverzeichnis, Version und Ausgangsstand prüfen:
+Zuerst die [portable Laufzeit](#portable-specify-laufzeit) einrichten und den
+geprüften Ausgangsstand committen. Das gemeinsame Init-Skript wählt automatisch
+PowerShell und erhält die Constitution:
 
 ```powershell
-Get-Location
-specify version
-git status
+.\scripts\specify.ps1 version --features --json
+python scripts/init_speckit.py --integration codex
+.\scripts\specify.ps1 integration status
 ```
 
-Die CLI-Version muss zu `speckit_version` in `config/project.yaml` passen.
-Den geprüften Ausgangsstand einschließlich Constitution vorher committen.
-Anschließend diesen Block zusammenhängend in PowerShell ausführen:
-
-```powershell
-if (Test-Path -LiteralPath .specify/integration.json) {
-    throw 'Bereits initialisiert; die Integrationsverwaltung verwenden.'
-}
-$constitutionPath = (Resolve-Path -LiteralPath .specify/memory/constitution.md).Path
-$constitutionBytes = [System.IO.File]::ReadAllBytes($constitutionPath)
-try {
-    specify init --here --force --integration codex --script ps
-    if ($LASTEXITCODE -ne 0) { throw 'Spec-Kit-Initialisierung fehlgeschlagen.' }
-}
-finally {
-    [System.IO.File]::WriteAllBytes($constitutionPath, $constitutionBytes)
-}
-```
-
-`--here` wählt das aktuelle Projekt; `--force` erlaubt das bereits gefüllte
-Verzeichnis. Der Block erhält die vorhandene Constitution auch bei einem
-Fehler. Die übrigen erzeugten Änderungen danach mit `git status`, `git diff`
-und durch Lesen neuer Dateien prüfen, insbesondere die lokalen Anpassungen
-unter `.specify/templates/overrides/`. Bei einem Fehler den Zwischenstand
-prüfen, bevor ein weiterer Initialisierungsversuch erfolgt.
-
-Mit `specify integration list` die Installation kontrollieren. Die
-[Codex-Integration von Spec Kit](https://github.com/github/spec-kit/blob/v1.0.7/docs/reference/integrations.md)
-legt Skills unter `.agents/skills/speckit-*/SKILL.md` ab. Diese werden im
-Codex-Chat als `$speckit-<name>` aufgerufen. Werden sie nicht erkannt, den
-Projektordner und die installierte Integration prüfen und Codex neu starten;
-siehe [Skill-Erkennung in Codex](https://developers.openai.com/codex/skills).
+Danach Git-Status, Diff und neue Dateien prüfen. Codex-Skills liegen unter
+`.agents/skills/`; eine neue Agent-Sitzung erkennt die installierten Skills.
 
 #### Bestehende Integrationen
 
-**Lokaler Windows-Stand vom 25.10.2026:** Codex ist installiert und wird von
-Spec Kit erkannt. Fehlt der `specify`-Starter im PATH, lässt sich dieselbe
-installierte CLI ohne erneute Installation aufrufen:
-
-```powershell
-python -c "from specify_cli import main; main()" integration status
-```
-
-Die Skriptausführung ist lokal standardmäßig gesperrt. Für die Vorprüfung
-genügt eine Richtlinie nur für den gestarteten Prozess; Benutzer- und
-Systemrichtlinien bleiben unverändert:
-
-```powershell
-powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks
-```
-
-Der aktuelle lokale Feature-Kontext verweist auf `specs/004-analyze-gate`.
-Automatische VS-Code-Tasks sind auf Nutzerwunsch über
-`task.allowAutomaticTasks: off` deaktiviert. Diese Einstellung steuert keine
-Agentenfreigaben für Terminalbefehle. Die fehlgeschlagene Sandbox-Einrichtung
-(`setup refresh had errors`) ist ein separates Problem der Agent-Umgebung;
-Projektdateien können diesen Fehler nicht nachweislich beheben.
+Die vorhandenen Integrationen mit dem Repository-Wrapper prüfen.
+Ein neuer Codespace erfordert keine erneute Initialisierung. Die frühere lokale
+Sandbox-Störung ist unabhängig von der Specify-Installation.
 
 `specify integration list` zeigt installierte Integrationen. Fehlt Codex in
 einem bereits initialisierten Projekt, kann es mit
@@ -921,7 +1017,8 @@ Die Referenzkopie bleibt unverändert.
 
 ## Weiterentwicklung und Versionen
 
-Template-Version und verwendete Spec-Kit-Version stehen in `config/project.yaml`.
+Die Template-Version steht in `config/project.yaml`, die CLI-Version zentral in
+`.specify-version`.
 Neue Projekte erhalten zusätzlich den Ausgangscommit; `+working-tree` kennzeichnet
 eine Erzeugung aus noch nicht vollständig eingecheckten Änderungen.
 
@@ -935,6 +1032,24 @@ Katalog aufnehmen. Projektanforderungen, aktive Konfiguration und dieses
 Dokument bei Änderungen zusammenführen.
 
 ## Prüfstatus
+
+### Portable Specify-Laufzeit – 26.10.2026
+
+| Prüfung | Ergebnis |
+| --- | --- |
+| Umgebung / uv | Windows: Python 3.13.9, uv 0.12.15 vorhanden; WSL-Ubuntu: Python 3.14.4, fehlendes uv durch den lokalen gepinnten Fallback installiert |
+| Specify-Installation | 1.0.7 aus zentraler Versionsdatei mit universellen transitiven Constraints unter beiden Plattformen installiert und importiert |
+| `version --features --json` | Linux-Wrapper und Windows-Python-Entrypoint liefern exakt 1.0.7 mit Features |
+| Neutrales generiertes Projekt | Echte Installation in Ordner mit fremdem Namen und Leerzeichen, Aufruf aus fremdem Arbeitsverzeichnis, Wiederholung ohne Neuinstallation und Reparatur erfolgreich unter Windows und Linux |
+| Argumente / Exit-Codes | Leerstrings, Leerzeichen, Unicode, Quotes, Shell-Sonderzeichen und abschließender Backslash über echte Python-Umgebung erhalten; Exit-Code 23 erhalten, ungültige CLI-Option liefert 2; PowerShell-JSON-Transport regressionsgeprüft |
+| Generator | Alle vier Profile und API-Rezept enthalten sämtliche Laufzeitdateien ohne Benutzerpfad oder Abhängigkeit vom Template-Namen |
+| Gemeinsame Prüfung Windows | `python scripts/check.py`: 30 Tests erfasst, 28 erfolgreich, zwei POSIX-Prüfungen übersprungen; Links und Python-/JSON-/YAML-Syntax erfolgreich |
+| Gemeinsame Prüfung Linux | `python scripts/check.py` unter WSL: alle 30 Tests erfolgreich, einschließlich POSIX-Shell und Post-Create ohne Ausführungsbit |
+| PowerShell | AST-Parser ohne Fehler; direkter `.ps1`-Start an bestehender Execution Policy gesperrt, Richtlinie unverändert; echter Adapter-Lauf zusätzlich in Windows-CI konfiguriert |
+| Devcontainer | JSON, referenzierte Dateien, Generatorausgaben und Post-Create-Verkettung automatisiert geprüft; kein Docker-Build, Containerstart oder echter Codespace ausgeführt |
+| Workflow / Diff | `workflow info .specify/workflows/project-sdd/workflow.yml` erfolgreich; `workflow validate` als nicht vorhandener alter CI-Aufruf korrigiert; `git diff --check` erfolgreich |
+| Grenzen der Reproduktion | Paketversionen fixiert; keine Download-Hashes, kein Offline-Versprechen und kein Basisimage-Digest; vorhandenes uv kann vom gepinnten Fallback abweichen |
+
 
 ### Review-Korrekturen – 25.10.2026
 

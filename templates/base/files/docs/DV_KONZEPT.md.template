@@ -283,6 +283,87 @@ Für Python bei der Festlegung der Anwendungsabhängigkeiten einen passenden
 Lock-/Constraint-Stand ergänzen. Die Toolversionen des Grundgerüsts stehen in
 `config/project.yaml` und `scripts/requirements.txt`.
 
+### Portable Specify-Laufzeit
+
+Die einzige CLI-Versionsquelle ist `.specify-version` (anfangs 1.0.7).
+Der vorhandene Devcontainer-/Codespaces-Post-Create-Schritt führt das Setup
+vor der Agent-Einrichtung automatisch aus. Lokal einmal im Repository ausführen:
+
+```sh
+python scripts/bootstrap_specify.py
+```
+
+Voraussetzung ist Python ab 3.11 mit pip ab 22.3 und venv. Vorhandenes `uv` wird verwendet;
+fehlt es, installiert das Setup den Pin aus `scripts/uv-requirements.txt` in eine
+ignorierte lokale Umgebung. Persönliche Profile und PATH-Anpassungen sind unnötig.
+Mehrfaches Setup prüft die Paketversion und erhält passende Installationen.
+
+**Windows PowerShell:**
+
+```powershell
+.\scripts\specify.ps1 version --features --json
+.\scripts\specify.ps1 integration list
+```
+
+**Linux / Codespaces:**
+
+```sh
+./scripts/specify version --features --json
+./scripts/specify integration list
+```
+
+In den folgenden allgemeinen CLI-Beispielen steht `specify` für diesen
+Repository-Wrapper; unter Windows immer die PowerShell-Variante verwenden.
+Die Wrapper bestimmen ihren Dateipfad relativ zum Skript; Specify selbst arbeitet
+im aktuellen Arbeitsverzeichnis. Argumente und Exit-Codes werden weitergereicht.
+
+Die Tool-Umgebungen liegen getrennt nach Plattform unter `.artifacts/specify/`.
+Das Setup setzt `UV_TOOL_DIR` und `UV_TOOL_BIN_DIR` nur für seine Kindprozesse;
+`uv tool dir` liefert den tatsächlichen Installationspfad. Dadurch beeinflussen
+sich verschiedene Repositories und Versionen nicht gegenseitig. Der Wrapper
+ruft dessen Python mit `from specify_cli import main; main()` auf. Der von uv
+erzeugte `specify.exe`-Launcher wird nie gestartet. Windows Smart App Control
+kann diesen unsignierten Launcher blockieren, obwohl das Paket selbst funktioniert.
+Sicherheitsrichtlinien, Registry und PowerShell-Profile werden nicht geändert.
+Auch der Python-Interpreter und lokale Skripte müssen nach den geltenden Regeln
+ausführbar sein; die Wrapper ändern keine Ausführungsrichtlinie. Falls PowerShell
+lokale Skripte sperrt, dieselbe Schnittstelle mit
+`python scripts/specify_tool.py version --features --json` verwenden.
+
+**Diagnose:** `python --version` und, falls vorhanden, `uv --version` prüfen.
+Bei fehlender/falscher Installation Setup erneut ausführen. Bei beschädigten
+Abhängigkeiten `python scripts/bootstrap_specify.py --repair` verwenden.
+Fehler bei Downloads, Zertifikaten oder Berechtigungen zuerst beheben; keine
+Sicherheitsfunktionen abschalten. Nicht die global installierte CLI reparieren:
+der Repository-Wrapper verwendet seine eigene Umgebung.
+
+Transitive Abhängigkeiten stehen plattformübergreifend in
+`scripts/specify-constraints.txt`. Ein Installationsfingerabdruck erkennt
+Änderungen am Pin oder an diesen Constraints; das Setup installiert dann neu.
+
+**Upgrade:** `.specify-version` ändern,
+`python scripts/bootstrap_specify.py --update-lock` ausführen (aktualisiert die
+transitiven Pins und installiert neu), beide Wrapper mit
+`version --features --json` sowie die Projektprüfungen testen und den geprüften
+Stand committen. Vorhandene Integrationen separat mit dem Wrapper und
+`integration upgrade <integration>` aktualisieren; Diff prüfen. Die Constraints fixieren Paketversionen, keine Download-Hashes oder
+Betriebssystem-/Python-Images; eine Offline-Installation wird nicht zugesichert.
+
+Neue Projekte übernehmen den neuen Stand. Bereits früher erzeugte Repositories
+werden nicht automatisch aktualisiert. Für eine manuelle Übernahme gehören
+`.specify-version`, `scripts/bootstrap_specify.py`, `scripts/specify_tool.py`,
+`scripts/specify`, `scripts/specify.ps1`, `scripts/uv-requirements.txt`,
+`scripts/specify-constraints.txt` und das
+angepasste `scripts/init_speckit.py` zusammen. Dazu die Änderungen an
+`.devcontainer/Dockerfile`, `.devcontainer/post-create.sh`, `.gitignore`
+(`.artifacts/`), Agentenregeln und dieser Anleitung gezielt zusammenführen;
+POSIX-Ausführungsbit für `scripts/specify` erhalten. Einen alten
+`speckit_version`-Eintrag in `config/project.yaml` entfernen. Generator und
+Template-Tests sind nur bei Pflege eines weiteren Templates nötig.
+
+Technische Grundlagen: [uv-Tool-Umgebungen](https://docs.astral.sh/uv/concepts/tools/)
+und [Spec-Kit-Paket-Entrypoint](https://github.com/github/spec-kit/blob/v1.0.7/pyproject.toml).
+
 ### Spec Kit
 
 Im Projekt-Root arbeiten und zuerst die [Abhängigkeiten](#abhängigkeiten)
@@ -290,18 +371,9 @@ installieren. Der Generator initialisiert kein Git-Repository: bei Bedarf
 `git init` ausführen, Dateien prüfen und den Ausgangsstand lokal committen.
 Die vorhandene Constitution ist die Grundlage; keine zweite Vorlage anlegen.
 
-Die CLI-Version steht als `speckit_version` in `config/project.yaml`.
-Im Container ist sie bereits installiert. Außerhalb dieselbe Version
-bereitstellen; für den mitgelieferten Stand lautet die Installation:
-
-```sh
-python -m pip install specify-cli==1.0.7
-specify version
-```
-
-Mit vorhandenem `uv` ist `uv tool install specify-cli==1.0.7` eine Alternative.
+Die [portable Laufzeit](#portable-specify-laufzeit) stellt die CLI bereit.
 Auch den gewählten Coding-Agenten in der verwendeten Umgebung bereitstellen;
-der Devcontainer installiert ihn nicht automatisch.
+Copilot wird im Post-Create eingerichtet; andere Agenten separat installieren.
 
 **Linux-Container / Bash:** Einmalig die gewünschte Integration initialisieren,
 zum Beispiel Codex:
@@ -312,38 +384,18 @@ python scripts/init_speckit.py --integration codex
 
 Alternativ `--integration copilot` oder `--integration cursor-agent` wählen.
 Das Skript prüft die festgelegte Version, erhält die Constitution und verwendet
-Bash-Skripte (`--script sh`). Es besitzt keinen eigenen `--script`-Parameter.
+unter Linux Bash-Skripte, unter Windows automatisch PowerShell-Skripte.
 
-**Native Windows PowerShell:** Nach Versionsprüfung und gesichertem
-Ausgangsstand stattdessen diesen zusammenhängenden Block für ein noch nicht
-initialisiertes Projekt verwenden; er erhält die vorhandene Constitution:
+**Native Windows PowerShell:** Dasselbe Init-Skript verwenden:
 
 ```powershell
-if (Test-Path -LiteralPath .specify/integration.json) {
-    throw 'Bereits initialisiert; die Integrationsverwaltung verwenden.'
-}
-$constitutionPath = (Resolve-Path -LiteralPath .specify/memory/constitution.md).Path
-$constitutionBytes = [System.IO.File]::ReadAllBytes($constitutionPath)
-try {
-    specify init --here --force --integration codex --script ps
-    if ($LASTEXITCODE -ne 0) { throw 'Spec-Kit-Initialisierung fehlgeschlagen.' }
-}
-finally {
-    [System.IO.File]::WriteAllBytes($constitutionPath, $constitutionBytes)
-}
+python scripts/init_speckit.py --integration codex
+.\scripts\specify.ps1 integration status
 ```
 
-Auch hier bei Bedarf `codex` durch die gewünschte Integration ersetzen.
-`--here` wählt den aktuellen Ordner, `--force` erlaubt die Initialisierung im
-gefüllten Projekt und `--script ps` wählt PowerShell. Bei einem Fehler den
-Zwischenstand prüfen, bevor ein weiterer Versuch erfolgt.
-
-Anschließend `specify integration list` und `specify integration status`
-ausführen, mit `git status` und `git diff` die Änderungen prüfen und neue
-Dateien zusätzlich lesen. Die geprüften Integrationsdateien in einem eigenen
-lokalen Commit sichern. Bei einem späteren Wiedereinstieg keine erneute
-Initialisierung durchführen. Für geplante Versionswechsel den manifestgestützten
-Weg `specify integration upgrade <integration>` verwenden und Änderungen prüfen.
+Das Skript erhält die Constitution und wählt `--script ps`.
+Danach Git-Status, Diff und neue Dateien prüfen. Bereits eingerichtete
+Integrationen über den Wrapper mit `integration upgrade <integration>` pflegen.
 
 Die Feature-Schritte gehören in den **Agenten-Chat**. Spec Kit 1.0.7 installiert
 Codex-Skills unter `.agents/skills/`, Copilot-Skills standardmäßig unter
@@ -370,7 +422,7 @@ falls die Umgebung nur `python3` bereitstellt, diesen entsprechend verwenden.
 | Terminalbefehl | Zweck |
 | --- | --- |
 | `git status` | Branch und vorgemerkte, nicht vorgemerkte sowie unversionierte Änderungen ansehen. |
-| `specify version` | CLI-Version mit `config/project.yaml` vergleichen. |
+| `specify version` | CLI-Version mit `.specify-version` vergleichen. |
 | `specify check` | Verfügbare Agent-CLI-Werkzeuge prüfen; IDE-Integrationen werden übersprungen. |
 | `specify integration list` | Installierte Integrationen und Standardintegration ansehen. |
 | `specify integration status` | Verwaltete Integrationsdateien und gemeinsame Spec-Kit-Struktur diagnostizieren. |

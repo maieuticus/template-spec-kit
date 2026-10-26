@@ -4,6 +4,9 @@
 
 Zuletzt erledigt · Aktuell in Arbeit · Nächste Schritte · Blockaden
 
+**Vor Weiterarbeit:** Die [priorisierten offenen Entscheidungen zum Codespace-Test](docs/DV_KONZEPT.md#priorisierte-offene-entscheidungen)
+zuerst gemeinsam und einzeln behandeln.
+
 Technologieoffenes Projektgrundgerüst für Spec-Driven Development. Ein gemeinsamer
 Kern wird mit einem Technologieprofil und den benötigten Diensten kombiniert.
 
@@ -21,8 +24,8 @@ Initialisierung einer bereits versionierten Integration.
   beispielsweise `$speckit-specify` mit dem Feature-Auftrag senden.
 - **GitHub Codespaces mit Copilot:** Die [Codespace-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace)
   und die [Agent-Integration](docs/DV_KONZEPT.md#agent-integration-und-chat-aufrufe)
-  durchführen. Die Copilot CLI wird nicht automatisch installiert; im
-  Bash-Terminal einmalig ausführen:
+  durchführen. Das vorhandene Post-Create-Skript installiert die Copilot CLI;
+  falls diese Einrichtung scheitert, im Bash-Terminal nachholen:
 
   ```sh
   curl -fsSL https://gh.io/copilot-install | bash
@@ -35,7 +38,8 @@ Initialisierung einer bereits versionierten Integration.
   die mitgelieferten `speckit-*`-Profile auch über die Agentenauswahl im
   Copilot-Chat gewählt werden.
 
-Mit `specify integration list` den vorhandenen Zustand zuerst prüfen. Für eine
+Mit dem Wrapper (`./scripts/specify integration list`, unter Windows
+`.\scripts\specify.ps1 integration list`) den vorhandenen Zustand zuerst prüfen. Für eine
 zusätzliche Integration die [Integrationsverwaltung](docs/DV_KONZEPT.md#bestehende-integrationen)
 verwenden. GitHubs **Use this template** kopiert das Repository; der
 [Generator](#2-ein-eigenes-projekt-erzeugen) erstellt daraus das Anwendungsprojekt.
@@ -129,74 +133,43 @@ einem lokalen Commit, bevor du Spec Kit initialisierst.
 
 ### 3. Codex installieren und Spec Kit initialisieren
 
-**Windows/PowerShell ohne Container:** Installiere die CLIs, sofern sie noch
-nicht in der benötigten Version vorhanden sind:
-
-```powershell
-python -m pip install specify-cli==1.0.7
-npm.cmd install -g @openai/codex
-specify version
-codex.cmd --version
-```
-
-`1.0.7` ist die in [config/project.yaml](config/project.yaml) festgelegte
-Spec-Kit-Version. Mit vorhandenem `uv` ist alternativ
-`uv tool install specify-cli==1.0.7` möglich. Falls `specify` nach einer
-pip-Installation fehlt, den Python-Scripts-Ordner in den Benutzer-`PATH`
-aufnehmen und das Terminal neu öffnen. Die `.cmd`-Aufrufe vermeiden unter
-PowerShell die Ausführung der npm-/Codex-`.ps1`-Starter.
-
-**Jetzt Spec Kit einmalig im Root-Verzeichnis des erzeugten Projekts
-initialisieren.** Der Generator und `git init` erledigen diesen Schritt nicht.
-Führe den folgenden Block zusammenhängend in PowerShell aus; er ruft
-`specify init` auf und erhält dabei die vorhandene Constitution:
-
-```powershell
-if (Test-Path -LiteralPath .specify/integration.json) {
-    throw 'Bereits initialisiert; die Integrationsverwaltung verwenden.'
-}
-$constitutionPath = (Resolve-Path -LiteralPath .specify/memory/constitution.md).Path
-$constitutionBytes = [System.IO.File]::ReadAllBytes($constitutionPath)
-try {
-    specify init --here --force --integration codex --script ps
-    if ($LASTEXITCODE -ne 0) { throw 'Spec-Kit-Initialisierung fehlgeschlagen.' }
-}
-finally {
-    [System.IO.File]::WriteAllBytes($constitutionPath, $constitutionBytes)
-}
-```
-
-`--here` wählt das aktuelle Verzeichnis, `--force` erlaubt den bereits gefüllten
-Projektordner, `--integration codex` richtet die Codex-Skills ein und
-`--script ps` wählt PowerShell-Skripte. Bei einem Fehler den Zwischenstand
-prüfen, bevor du fortfährst. Details stehen im
-[PowerShell-Ablauf](docs/DV_KONZEPT.md#codex-mit-windows-powershell-initialisieren).
-
-**Linux-Devcontainer:** Folge der
-[Containereinrichtung](docs/DV_KONZEPT.md#lokaler-container-und-referenz-repositories)
-und öffne das erzeugte Projekt mit „Reopen in Container“. Spec Kit ist dort
-bereits installiert. Stelle Codex gemäß
-[Codex-Einrichtung](docs/DV_KONZEPT.md#codex-installieren) auch im Container
-bereit und führe in dessen Terminal aus:
+Die [portable Specify-Laufzeit](docs/DV_KONZEPT.md#portable-specify-laufzeit)
+verwendet die zentrale `.specify-version`. Im Devcontainer/Codespace erfolgt
+das Setup automatisch, lokal einmalig:
 
 ```sh
+python scripts/bootstrap_specify.py
+```
+
+Windows PowerShell:
+
+```powershell
+.\scripts\specify.ps1 version --features --json
+npm.cmd install -g @openai/codex
 python scripts/init_speckit.py --integration codex
 ```
 
-Das vorhandene Init-Skript prüft die Spec-Kit-Version, erhält die Constitution
-und ruft intern `specify init --here --integration codex --script sh --force`
-auf. Verwende es für die Arbeit im Linux-Container. Für native PowerShell gilt
-der obige Block mit `--script ps`. Wähle einen der beiden Wege.
+Linux / Codespaces:
 
-**GitHub Codespaces:** Die GitHub Copilot CLI wird nicht automatisch
-installiert. Folge der [Codespace-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace);
+```sh
+./scripts/specify version --features --json
+python scripts/init_speckit.py --integration codex
+```
+
+Das Init-Skript erhält die Constitution und wählt automatisch PowerShell oder
+Bash. Codex gemäß [Anleitung](docs/DV_KONZEPT.md#codex-installieren) bereitstellen.
+Unter Windows verwendet der Wrapper den Python-Entrypoint statt `specify.exe`;
+Smart App Control und persönliche Profile bleiben unverändert.
+
+**GitHub Codespaces:** Das Post-Create-Skript richtet Specify und die Copilot CLI
+ein. Folge der [Codespace-Einrichtung](docs/DV_KONZEPT.md#copilot-cli-im-codespace);
 starte sie danach mit `copilot` und melde dich beim ersten Start über `/login`
 an.
 
 Nach erfolgreicher Initialisierung im Projekt-Terminal prüfen:
 
 ```sh
-specify integration list
+./scripts/specify integration list
 git status
 git diff
 ```
@@ -274,7 +247,7 @@ Beim nächsten Arbeitsstart öffnest du dasselbe Projekt, startest Codex und
 arbeitest am bestehenden Feature weiter oder beginnst mit `$speckit-specify`
 ein neues. Installation, Initialisierung und Constitution sind keine Schritte,
 die du bei jedem Feature wiederholst. Wenn Skills fehlen, prüfe
-`specify integration list` und `.agents/skills/` und starte Codex neu.
+die Wrapper-Ausgabe von `integration list` und `.agents/skills/` und starte Codex neu.
 
 ## Orientierung
 

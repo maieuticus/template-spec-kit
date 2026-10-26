@@ -102,6 +102,10 @@ class ProjectGenerationTests(unittest.TestCase):
             root = self.generate(directory)
             script = root / ".devcontainer/post-create.sh"
             script.chmod(0o644)
+            # This regression tests lifecycle wiring, without downloading tools.
+            (root / "scripts/bootstrap_specify.py").write_text(
+                "print('bootstrap-test')\n", encoding="utf-8"
+            )
             bin_dir = Path(directory) / "bin"
             bin_dir.mkdir()
             copilot = bin_dir / "copilot"
@@ -114,6 +118,7 @@ class ProjectGenerationTests(unittest.TestCase):
                 capture_output=True, text=True, check=True,
             )
             self.assertIn("copilot-test", result.stdout)
+            self.assertLess(result.stdout.index("bootstrap-test"), result.stdout.index("copilot-test"))
 
     def test_analyze_gate_checks_report_before_manual_gate_in_source_and_generated_project(self):
         def assert_workflow_contract(workflow_path: Path) -> None:

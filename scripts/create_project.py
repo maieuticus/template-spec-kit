@@ -19,6 +19,8 @@ CORE_FILES = (
     ".devcontainer/Dockerfile", ".devcontainer/post-create.sh", "config/repositories.yaml",
     "scripts/check.py", "scripts/check_analyze_gate.py", "scripts/status.py", "scripts/container_init.py", "scripts/init_speckit.py",
     "scripts/prepare_contribution.py", "scripts/requirements.txt",
+    ".specify-version", "scripts/specify", "scripts/specify.ps1", "scripts/specify_tool.py",
+    "scripts/bootstrap_specify.py", "scripts/uv-requirements.txt", "scripts/specify-constraints.txt",
     "docs/decisions/README.md",
 )
 CORE_TREES = (
@@ -170,6 +172,8 @@ def create_project(output: Path, files: dict[str, bytes], dry_run: bool = False)
         destination.parent.mkdir(parents=True, exist_ok=True)
         with destination.open("xb") as stream:
             stream.write(data)
+        if relative == "scripts/specify":
+            destination.chmod(0o755)
     print(f"Projekt erstellt: {output} ({len(files)} Dateien)")
 
 

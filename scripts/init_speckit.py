@@ -2,11 +2,11 @@
 
 import argparse
 from pathlib import Path
-import shutil
+import os
 import subprocess
 import sys
 
-import yaml
+from specify_tool import ENTRYPOINT, runtime
 
 
 def main() -> int:
@@ -16,25 +16,15 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     if (root / ".specify/integration.json").exists():
         parser.error("Bereits initialisiert. Für Updates: specify integration upgrade <integration>.")
-    config = yaml.safe_load((root / "config/project.yaml").read_text(encoding="utf-8"))
-    version = config["speckit_version"]
-    specify = shutil.which("specify")
-    if specify:
-        installed = subprocess.run([specify, "version"], capture_output=True, text=True, check=True)
-        if str(version) not in installed.stdout:
-            parser.error(f"Spec Kit {version} erforderlich. Installierte Version: {installed.stdout.strip()}")
-        command = [specify]
-    elif shutil.which("uvx"):
-        command = ["uvx", "--from", f"specify-cli=={version}", "specify"]
-    else:
-        parser.error(f"Spec Kit installieren: python -m pip install specify-cli=={version}")
+    python, env = runtime()
+    command = [str(python), "-I", "-c", ENTRYPOINT]
     constitution = root / ".specify/memory/constitution.md"
     original = constitution.read_bytes()
     try:
         result = subprocess.run(
             command + ["init", "--here", "--integration", args.integration,
-                       "--script", "sh", "--force"],
-            cwd=root, check=False,
+                       "--script", "ps" if os.name == "nt" else "sh", "--force"],
+            cwd=root, env=env, check=False,
         )
     finally:
         constitution.write_bytes(original)
@@ -42,4 +32,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except (OSError, ValueError, subprocess.CalledProcessError) as error:
+        print(error, file=sys.stderr)
+        sys.exit(1)
